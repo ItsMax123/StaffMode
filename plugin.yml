@@ -1,0 +1,49 @@
+name: StaffMode-MaxMade
+author: ItsMax123
+main: Max\StaffMode\Main
+version: 1.0.0
+api: [3.0.0]
+
+commands:
+ staffmode:
+  description: Puts you in staff mode.
+  usage: "/staffmode"
+  aliases: ["sm"]
+  permission: staffmode.command.staffmode
+ report:
+  description: Opens the report Interface.
+  usage: "/report"
+  permission: staffmode.command.report
+
+permissions:
+  staffmode.command.staffmode:
+    default: op
+    description: Gives permission to do the "/staffmode" command.
+  staffmode.command.report:
+    default: true #Eveyone should be able to report players. If you dont want anyone to be able to report by default change this to "op".
+    description: Gives permission to do the "/report" command.
+  staffmode.tools.teleport:
+    default: op
+    description: Gives permission to use the teleportation tool (compass) in staffmode.
+  staffmode.tools.history:
+    default: op
+    description: Gives permission to use the history tool (book) in staffmode.
+  staffmode.tools.warn:
+    default: op
+    description: Gives permission to use the warning tool (paper) in staffmode.
+  staffmode.tools.freeze:
+    default: op
+    description: Gives permission to use the freezing tool (ice block) in staffmode.
+  staffmode.tools.unfreeze:
+    default: op
+    description: Gives permission to use the unfreezing tool (fire) in staffmode.
+  staffmode.tools.kick:
+    default: op
+    description: Gives permission to use the kicking tool (gold sword) in staffmode.
+  staffmode.tools.ban:
+    default: op
+    description: Gives permission to use the banning tool (gold axe) in staffmode.
+  staffmode.tools.exit:
+    default: true #Eveyone should be able to leave staffmode in case they SOMEHOW get stuck in it.
+    description: Gives permission to exit staffmode with the redstone torch tool.
+
