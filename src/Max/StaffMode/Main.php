@@ -5,52 +5,19 @@ declare(strict_types=1);
 namespace Max\StaffMode;
 
 use pocketmine\plugin\PluginBase;
-use pocketmine\event\player\PlayerInteractEvent;
-use pocketmine\event\player\PlayerItemConsumeEvent;
-use pocketmine\event\player\PlayerCommandPreprocessEvent;
-use pocketmine\event\player\PlayerDropItemEvent;
-use pocketmine\item\EnderPearl;
-use pocketmine\item\Book;
 use pocketmine\event\Listener;
-use pocketmine\entity\Human;
-use pocketmine\Server;
-use pocketmine\Player;
-use pocketmine\item\Item;
-use pocketmine\event\player\PlayerKickEvent;
-use pocketmine\event\player\PlayerJoinEvent;
-use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\event\player\PlayerMoveEvent;
-use pocketmine\event\entity\EntityTeleportEvent;
-use pocketmine\event\block\BlockBreakEvent;
-use pocketmine\event\block\BlockPlaceEvent;
-use pocketmine\level\Location;
-use pocketmine\level\Position;
-use pocketmine\entity\projectile\EnderPearl as EPearl;
-use pocketmine\event\entity\ProjectileHitEvent;
-use pocketmine\event\entity\ProjectileHitBlockEvent;
-use pocketmine\command\Command;
-use pocketmine\command\CommandSender;
-use pocketmine\utils\TextFormat;
-use pocketmine\item\enchantment\Enchantment;
-use pocketmine\item\enchantment\EnchantmentInstance;
-use pocketmine\nbt\tag\StringTag;
-use pocketmine\event\entity\EntityDamageByEntityEvent;
-
-use onebone\economyapi\EconomyAPI;
-use DaPigGuy\PiggyCustomEnchants\utils\Utils;
-use DaPigGuy\PiggyCustomEnchants\CustomEnchantManager;
-use DaPigGuy\PiggyCustomEnchants\PiggyCustomEnchants;
-use DaPigGuy\PiggyCustomEnchants\enchants\CustomEnchantIds;
-
-use pocketmine\event\player\PlayerPreLoginEvent;
-use jojoe77777\FormAPI\SimpleForm;
-use jojoe77777\FormAPI\CustomForm;
-
-use pocketmine\permission\BanEntry;
 
 use pocketmine\utils\Config;
+use pocketmine\{Player, Server};
+use pocketmine\item\Item;
+use pocketmine\command\{Command, CommandSender};
+use pocketmine\nbt\tag\StringTag;
 
-use \Datetime;
+use pocketmine\event\player\{PlayerInteractEvent, PlayerCommandPreprocessEvent, PlayerDropItemEvent, PlayerKickEvent, PlayerJoinEvent, PlayerQuitEvent, PlayerPreLoginEvent};
+use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
+
+use Max\StaffMode\Forms\{SimpleForm, CustomForm};
 
 class Main extends PluginBase implements Listener {
 
@@ -103,7 +70,7 @@ class Main extends PluginBase implements Listener {
                     $hours = (int)(($time - ($days * 86400)) / 3600);
                     $minutes = (int)(($time - (($days * 86400) + ($hours * 3600))) / 60);
                     $seconds = (int)($time - (($days * 86400) + ($hours * 3600) + ($minutes * 60)));
-                    $player->close("", "§cYou are banned!\n§rBy: ".$staff."\nReason: ".$reason."\nDuration: ".$days."d, ".$hours."h, ".$minutes."m, ".$seconds."s");
+                    $player->close("", "§cYou are banned!\n§rBy: ".$staff."\nReason: ".$reason."\nTime left: ".$days."d, ".$hours."h, ".$minutes."m, ".$seconds."s");
                 }
                 $event->setCancelled();
             }

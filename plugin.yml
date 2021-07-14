@@ -16,34 +16,37 @@ commands:
   permission: staffmode.command.report
 
 permissions:
-  staffmode.command.staffmode:
-    default: op
-    description: Gives permission to do the "/staffmode" command.
   staffmode.command.report:
     default: true #Eveyone should be able to report players. If you dont want anyone to be able to report by default change this to "op".
-    description: Gives permission to do the "/report" command.
-  staffmode.tools.teleport:
+    description: Allows usage of the "/report" command.
+  staffmode.*:
     default: op
-    description: Gives permission to use the teleportation tool (compass) in staffmode.
-  staffmode.tools.history:
-    default: op
-    description: Gives permission to use the history tool (book) in staffmode.
-  staffmode.tools.warn:
-    default: op
-    description: Gives permission to use the warning tool (paper) in staffmode.
-  staffmode.tools.freeze:
-    default: op
-    description: Gives permission to use the freezing tool (ice block) in staffmode.
-  staffmode.tools.unfreeze:
-    default: op
-    description: Gives permission to use the unfreezing tool (fire) in staffmode.
-  staffmode.tools.kick:
-    default: op
-    description: Gives permission to use the kicking tool (gold sword) in staffmode.
-  staffmode.tools.ban:
-    default: op
-    description: Gives permission to use the banning tool (gold axe) in staffmode.
-  staffmode.tools.exit:
-    default: true #Eveyone should be able to leave staffmode in case they SOMEHOW get stuck in it.
-    description: Gives permission to exit staffmode with the redstone torch tool.
-
+    description: Allows usage of all staffmode features.
+    children: 
+      staffmode.command.staffmode:
+        default: op
+        description: Allows usage of the "/staffmode" command.
+      staffmode.tools.teleport:
+        default: op
+        description: Allows usage of the teleportation tool (compass) in staffmode.
+      staffmode.tools.history:
+        default: op
+        description: Allows usage of the history tool (book) in staffmode.
+      staffmode.tools.warn:
+        default: op
+        description: Allows usage of the warning tool (paper) in staffmode.
+      staffmode.tools.freeze:
+        default: op
+        description: Allows usage of the freezing tool (ice block) in staffmode.
+      staffmode.tools.unfreeze:
+        default: op
+        description: Allows usage of the unfreezing tool (fire) in staffmode.
+      staffmode.tools.kick:
+        default: op
+        description: Allows usage of the kicking tool (gold sword) in staffmode.
+      staffmode.tools.ban:
+        default: op
+        description: Allows usage of the banning tool (gold axe) in staffmode.
+      staffmode.tools.exit:
+        default: true #Eveyone should be able to leave staffmode in case they SOMEHOW get stuck in it.
+        description: Allows usage of the exit tool (redstone torch) in staffmode.
