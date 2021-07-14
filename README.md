@@ -1,3 +1,6 @@
+[![](https://poggit.pmmp.io/shield.state/StaffMode)](https://poggit.pmmp.io/p/StaffMode)
+[![](https://poggit.pmmp.io/shield.api/StaffMode)](https://poggit.pmmp.io/p/StaffMode)
+
 <img src="https://www.gstatic.com/images/branding/product/1x/admin_512dp.png" width="120" height="120" align="left"></img>
 
 # StaffMode
