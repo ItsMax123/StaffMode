@@ -5,5 +5,5 @@ branches:
 projects:
   StaffMode:
     path: ""
-    icon: "admintools"
+    icon: "admintools.png"
 ...
