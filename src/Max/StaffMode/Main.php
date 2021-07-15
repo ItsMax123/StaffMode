@@ -33,11 +33,11 @@ class Main extends PluginBase implements Listener {
         if(!file_exists($this->getDataFolder())){
             mkdir($this->getDataFolder());
         }
-        #$this->saveResource("config.yml");
+        $this->saveResource("config.yml");
         $this->banList = new Config($this->getDataFolder()."BanList.yml", Config::YAML);
         $this->history = new Config($this->getDataFolder()."History.yml", Config::YAML);
         $this->reportList = new Config($this->getDataFolder()."ReportList.yml", Config::YAML);
-        #$this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
+        $this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
 
@@ -113,6 +113,12 @@ class Main extends PluginBase implements Listener {
                     $this->contents[$sender->getName()] = $sender->getInventory()->getContents();
                     $this->position[$sender->getName()] = $sender->getPosition();
                     $this->staffmodestatus[$sender->getName()] = True;
+                    if($this->config->get("FakeLeave") === true){
+                        $message = $this->getConfig()->get("FakeLeave-Message");
+                        $name = $sender->getName();
+                        $message = str_replace("<player>", "$name", $message);
+                        $this->getServer()->broadcastMessage($message);
+                    }
                     $sender->getInventory()->clearAll();
                     $sender->setGamemode(Player::SPECTATOR);
                     //$sender->teleport(Server::getInstance()->getDefaultLevel()->getSafeSpawn());
@@ -241,6 +247,12 @@ class Main extends PluginBase implements Listener {
                 } elseif($item->getId() == Item::LIT_REDSTONE_TORCH) {
                     if ($player->hasPermission("staffmode.tools.exit")) {
                         $this->exitstaffmode($player);
+                        if($this->config->get("FakeJoin") == true){
+                            $message = $this->getConfig()->get("FakeJoin-Message");
+                            $name = $player->getName();
+                            $message = str_replace("<player>", "$name", $message);
+                            $this->getServer()->broadcastMessage($message);
+                        }
                     } else {
                         $player->sendMessage("§7[§bStaffMode§7] §cYou do not have permission to use this tool.");
                     }

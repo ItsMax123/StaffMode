@@ -1,0 +1,6 @@
+# Send a fake leave message whenever you go in StaffMode: 
+FakeLeave: true
+FakeLeave-Message: "§e<player> left the game"
+# Send a fake join message whenever you leave StaffMode: 
+FakeJoin: true
+FakeJoin-Message: "§e<player> joined the game"
