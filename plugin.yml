@@ -26,6 +26,9 @@ permissions:
       staffmode.command.staffmode:
         default: op
         description: Allows usage of the "/staffmode" command.
+      staffmode.silent:
+        default: op
+        description: Allows player to join and leave the server with no broadcasted message.
       staffmode.tools.teleport:
         default: op
         description: Allows usage of the teleportation tool (compass) in staffmode.

@@ -80,17 +80,37 @@ class Main extends PluginBase implements Listener {
 
     //Set player default statuses (Might not be neccesary):
 
+    /**
+     * @param PlayerJoinEvent $event
+     * @priority HIGHEST
+     */
+
     public function onJoin(PlayerJoinEvent $event){
         $player = $event->getPlayer();
         $this->staffmodestatus[$player->getName()] = False;
         $this->frozenstatus[$player->getName()] = False;
+        if($this->config->get("SilentJoin") === true){
+            if($player->hasPermission("staffmode.silent")) {
+                $event->setJoinMessage(null);
+            }
+        }
     }
 
     //All three next functions are to call exist staff mode when they exit the server:
 
+    /**
+     * @param PlayerQuitEvent $event
+     * @priority HIGHEST
+     */
+
     public function onQuit(PlayerQuitEvent $event){
         $player = $event->getPlayer();
         $this->exitstaffmode($player);
+        if($this->config->get("SilentLeave") == true){
+            if ($player->hasPermission("staffmode.silent")) {
+                $event->setQuitMessage(null);
+            }
+        }
     }
 
     public function onKick(PlayerKickEvent $event){

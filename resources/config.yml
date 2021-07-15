@@ -1,6 +1,11 @@
 # Send a fake leave message whenever you go in StaffMode: 
 FakeLeave: true
 FakeLeave-Message: "§e<player> left the game"
+
 # Send a fake join message whenever you leave StaffMode: 
-FakeJoin: true
+FakeJoin: false
 FakeJoin-Message: "§e<player> joined the game"
+
+#This removes the join and leave message for players with the staffmode.silent permission.
+SilentJoin: true
+SilentLeave: false
