@@ -50,10 +50,12 @@ If you do not have discord please create an issue on github. Please keep in mind
   - [x] Custom ban system
   - [x] Tool to exit staff mode
   - [x] Return to original location with the original inventory after exiting staffmode.
+  - [x] Silent Join & Leave (Editable in config)
+  - [x] Fake Join & Leave when entering/leaving StaffMode (Editable in config)
 - Coming soon...
-  - [ ] Customization in config.yml 
+  - [ ] More customization in config
   - [ ] Invsee tool
   - [ ] Mute tool
   - [ ] Custom mute system
   - [ ] Staff abuse prevention (Prevent staff from doing commands while in staffmode)
-  - [ ] And anything else you suggest
+  - [ ] Please suggest anything you want me to add
