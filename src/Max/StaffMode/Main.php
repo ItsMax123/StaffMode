@@ -318,13 +318,15 @@ class Main extends PluginBase implements Listener {
 
     public function EntityDamageByEntityEvent(EntityDamageByEntityEvent $event){
         $player = $event->getDamager();
-        if($this->frozenstatus[$player->getName()] === True) {
-            $event->setCancelled();
-            $player->sendMessage("§7[§bStaffMode§7] §cCannot do that while frozen!");
-        }
-        if ($player instanceof Player && $event->getEntity() instanceof Player) {
-            if($this->staffmodestatus[$player->getName()] === True) {
-                $player->sendMessage("§7[§bStaffMode§7] §aThe player you just hit is: ".$event->getEntity()->getName());
+        if ($player instanceof Player) {
+            if($this->frozenstatus[$player->getName()] === True) {
+                $event->setCancelled();
+                $player->sendMessage("§7[§bStaffMode§7] §cCannot do that while frozen!");
+            }
+            if ($player instanceof Player && $event->getEntity() instanceof Player) {
+                if($this->staffmodestatus[$player->getName()] === True) {
+                    $player->sendMessage("§7[§bStaffMode§7] §aThe player you just hit is: ".$event->getEntity()->getName());
+                }
             }
         }
     }
