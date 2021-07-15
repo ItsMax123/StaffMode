@@ -20,6 +20,7 @@ StaffMode is an all-in-one Pocketmine-MP (PMMP) moderation plugin made to simpli
 
 | Permissions | Description | Default | Risk |
 | --- | --- | --- | --- |
+| `staffmode.silent` | Allows user to join and leave the server with no broadcasted message. | `op` | - |
 | `staffmode.tools.teleport` | Allows usage of the teleportation tool (compass) in staffmode. | `op` | Low |
 | `staffmode.tools.history` | Allows usage of the history tool (book) in staffmode. | `op` | - |
 | `staffmode.tools.warn` | Allows usage of the warning tool (paper) in staffmode. | `op` | - |
