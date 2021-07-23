@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Max\StaffMode\ui;
 
 use jojoe77777\FormAPI\{SimpleForm, CustomForm};
-use Max\StaffMode\EventListener;
 use pocketmine\{Player, Server};
+use CortexPE\DiscordWebhookAPI\{Message, Webhook, Embed};
 
 class MuteForm {
     
@@ -26,7 +26,7 @@ class MuteForm {
             } elseif( $data == "list") {
                 self::ListMutingForm($player);
             }
-
+			return true;
         });
         $form->setTitle("Muting Menu");
         $form->addButton("Mute", -1, "", "mute");
@@ -42,7 +42,7 @@ class MuteForm {
             }
             if (count($this->plugin->getmutedplayersname()) == 0) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+				return true;
             }
 
             $target = $this->plugin->getmutedplayersname()[$data["unmuteplayer"]];
@@ -60,6 +60,7 @@ class MuteForm {
                 Server::getInstance()->getPlayer($target)->sendMessage("§aYou have been unmuted!\n§rBy: ".$player->getName()."\nReason: ".$data["reason"]);
             }
             $player->sendMessage("§7[§bStaffMode§7] §aSuccessfully unmuted player ".$target);
+			return true;
         });
         $form->setTitle("UnMuting Menu");
         $form->addDropdown("Pick the player you want to unmute", $this->plugin->getmutedplayersname(), null, "unmuteplayer");
@@ -69,9 +70,7 @@ class MuteForm {
 
     public function ListMutingForm(Player $player) : void {
         $form = new SimpleForm(function (Player $player, $data) {
-            if($data === null) {
-                return true;
-            }
+			return true;
         });
         $form->setTitle("Mute List");
         foreach ($this->plugin->muteList->getAll() as $mutedplayersnamekey => $mutedplayersinfo) {
@@ -98,22 +97,22 @@ class MuteForm {
 
             if($data["days"] == "0" and $data["hours"] == "0" and $data["minutes"] == "0" and $data["seconds"] == "0" and $data["forever"] == false) {
                 $player->sendMessage("§7[§bStaffMode§7] §cYou must specify an amount of time!");
-                return;
+				return true;
             }
 
             if($data["reason"] == "") {
                 $player->sendMessage("§7[§bStaffMode§7] §cYou must specify a reason!");
-                return;
+				return true;
             }
 
             if ($data["offlinename"] == "") {
                 if (count($this->plugin->getonlineplayersname()) == 0) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                    return;
+					return true;
                 }
                 if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                    return;
+					return true;
                 } else {
                     $target = $this->plugin->getonlineplayersname()[$data["name"]];
                 }
@@ -166,6 +165,7 @@ class MuteForm {
                 $msg->addEmbed($embed);
                 $webHook->send($msg);
             }
+			return true;
         });
         $form->setTitle("Muting Menu");
         $form->addDropdown("Pick the player you want to mute", $this->plugin->getonlineplayersname(), null, "name");

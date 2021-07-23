@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Max\StaffMode\ui;
 
-use jojoe77777\FormAPI\{SimpleForm, CustomForm};
-use Max\StaffMode\EventListener;
+use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\{Player, Server};
 
 class TeleportForm {
@@ -22,7 +21,7 @@ class TeleportForm {
             $target = Server::getInstance()->getPlayer($data);
             if($target === null) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+                return true;
             }
             $from = $player->getLevel();
             $to = $target->getLevel();
@@ -37,6 +36,7 @@ class TeleportForm {
                 $player->teleport($target);
                 $player->sendMessage("§7[§bStaffMode§7] §aSuccessfully teleported to player ".$target->getName());
             }
+			return true;
         });
         $form->setTitle("Teleportation Menu");
         $from = $player->getLevel();

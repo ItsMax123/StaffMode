@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Max\StaffMode\ui;
 
-use jojoe77777\FormAPI\{SimpleForm, CustomForm};
-use Max\StaffMode\EventListener;
+use jojoe77777\FormAPI\CustomForm;
 use pocketmine\{Player, Server};
+use CortexPE\DiscordWebhookAPI\{Message, Webhook, Embed};
 
 class KickForm {
     
@@ -22,18 +22,18 @@ class KickForm {
 
             if (count($this->plugin->getonlineplayersname()) == 0) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+				return true;
             }
 
             $target = Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]);
             if($target === null) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+				return true;
             }
 
             if($data["reason"] == "") {
                 $player->sendMessage("§7[§bStaffMode§7] §cYou must specify a reason!");
-                return;
+				return true;
             }
 
             $reason = (string)$data["reason"];
@@ -61,6 +61,7 @@ class KickForm {
                 $msg->addEmbed($embed);
                 $webHook->send($msg);
             }
+			return true;
         });
         $form->setTitle("Kicking Menu");
         $form->addDropdown("Pick the player you want to kick", $this->plugin->getonlineplayersname(), null, "name");

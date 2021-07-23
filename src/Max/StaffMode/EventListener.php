@@ -4,21 +4,16 @@ declare(strict_types=1);
 
 namespace Max\StaffMode;
 
-use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 
-//use pocketmine\utils\{Config, TextFormat};
-use pocketmine\{Player, Server};
+use pocketmine\Player;
 use pocketmine\item\Item;
-use pocketmine\nbt\tag\StringTag;
-use pocketmine\network\mcpe\protocol\{TextPacket, LoginPacket};
+use pocketmine\network\mcpe\protocol\{LoginPacket};
 
 use pocketmine\event\player\{PlayerInteractEvent, PlayerCommandPreprocessEvent, PlayerDropItemEvent, PlayerKickEvent, PlayerJoinEvent, PlayerQuitEvent, PlayerPreLoginEvent};
 use pocketmine\event\entity\{EntityDamageEvent, EntityDamageByEntityEvent, EntityLevelChangeEvent};
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\server\DataPacketReceiveEvent;
-
-use Max\StaffMode\ui\{ReportForm, TeleportForm, PlayerInfoForm, WarnForm, FreezeForm, MuteForm, KickForm, BanForm};
 
 class EventListener implements Listener {
 
@@ -27,27 +22,26 @@ class EventListener implements Listener {
         $pl->getServer()->getPluginManager()->registerEvents($this, $pl);
     }
 
-    //IF player is not banned, save all their user info.
-
+    //If player is NOT banned, save all their alias info when they join.
     /**
      * @ignoreCancelled true
      * @priority MONITOR
      */
+
     public function onDataPacketReceive(DataPacketReceiveEvent $event): void{
         $player = $event->getPlayer();
         $packet = $event->getPacket();
-        $alias = ["IPAddress" => null, "DeviceId" => null, "SelfSignedId" => null, "ClientRandomId" => null];
         if($packet instanceof LoginPacket){
             if(!Player::isValidUserName($packet->username)){
                 return;
             }
             if($this->plugin->banList->exists(strtolower($player->getName()))){
-                if (($this->plugin->banList->get(strtolower($player->getName()))["unbantime"] < time())OR($this->plugin->banList->get(strtolower($player->getName()))["unbantime"] - $this->plugin->banList->get(strtolower($player->getName()))["time"] != -1)) {
-                    $this->plugin->alias->set(strtolower($packet->username), ["IPAddress" => (string)$player->getAddress(), "DeviceId" => $packet->clientData['DeviceId'], "SelfSignedId" => $packet->clientData['SelfSignedId'], "ClientRandomId" => (string)$packet->clientData['ClientRandomId']]);
+                if (($this->plugin->banList->get(strtolower($player->getName()))["unbantime"] < time())AND($this->plugin->banList->get(strtolower($player->getName()))["unbantime"] - $this->plugin->banList->get(strtolower($player->getName()))["time"] != -1)) {
+                    $this->plugin->alias->set(strtolower($packet->username), ["IPAddress" => $player->getAddress(), "DeviceId" => $packet->clientData['DeviceId'], "SelfSignedId" => $packet->clientData['SelfSignedId'], "ClientRandomId" => (string)$packet->clientData['ClientRandomId']]);
                     $this->plugin->alias->save();
                 }
             } else {
-                $this->plugin->alias->set(strtolower($packet->username), ["IPAddress" => (string)$player->getAddress(), "DeviceId" => $packet->clientData['DeviceId'], "SelfSignedId" => $packet->clientData['SelfSignedId'], "ClientRandomId" => (string)$packet->clientData['ClientRandomId']]);
+                $this->plugin->alias->set(strtolower($packet->username), ["IPAddress" => $player->getAddress(), "DeviceId" => $packet->clientData['DeviceId'], "SelfSignedId" => $packet->clientData['SelfSignedId'], "ClientRandomId" => (string)$packet->clientData['ClientRandomId']]);
                 $this->plugin->alias->save();
             }
         }
@@ -55,7 +49,7 @@ class EventListener implements Listener {
 
     //Check if player is banned and kick him if he is:
 
-    public function onPlayerPreLogin(PlayerPreLoginEvent $event){
+    public function onPreLogin(PlayerPreLoginEvent $event){
         $player = $event->getPlayer();
         if($this->plugin->banList->exists(strtolower($player->getName()))){
             if (($this->plugin->banList->get(strtolower($player->getName()))["unbantime"] > time())OR($this->plugin->banList->get(strtolower($player->getName()))["unbantime"] - $this->plugin->banList->get(strtolower($player->getName()))["time"] == -1)) {
@@ -78,7 +72,7 @@ class EventListener implements Listener {
             }
         }
         foreach ($this->plugin->banList->getAll() as $bannedplayerinfo) {
-            if (count($bannedplayerinfo) == 7) {
+            if (isset($bannedplayerinfo["IPAddress"])) {
                 $BannedAddress = $bannedplayerinfo["IPAddress"];
                 $BannedDeviceId = $bannedplayerinfo["DeviceId"];
                 $BannedSelfSignedId = $bannedplayerinfo["SelfSignedId"];
@@ -89,12 +83,12 @@ class EventListener implements Listener {
                 $PlayerSelfSignedId = $this->plugin->alias->get(strtolower($player->getName()))["SelfSignedId"];
                 $PlayerClientRandomId = $this->plugin->alias->get(strtolower($player->getName()))["ClientRandomId"];
                 if(($BannedAddress == $PlayerAddress)OR($BannedDeviceId == $PlayerDeviceId)OR($BannedSelfSignedId == $PlayerSelfSignedId)OR($BannedClientRandomId == $PlayerClientRandomId)) {
-                    $staff = $bannedplayerinfo[2];
-                    $reason = $bannedplayerinfo[3];
-                    if((((int)$bannedplayerinfo[0]) - ((int)$bannedplayerinfo[1])) == -1) {
+                    $staff = $bannedplayerinfo["staff"];
+                    $reason = $bannedplayerinfo["reason"];
+                    if((((int)$bannedplayerinfo["unbantime"]) - ((int)$bannedplayerinfo["time"])) == -1) {
                         $player->close("", "§cYou are banned!\n§rBy: ".$staff."\nReason: ".$reason."\nDuration: Forever");
                     } else {
-                        $time = ((int)$bannedplayerinfo[0] - time());
+                        $time = ((int)$bannedplayerinfo["unbantime"] - time());
                         $days = (int)($time / 86400);
                         $hours = (int)(($time - ($days * 86400)) / 3600);
                         $minutes = (int)(($time - (($days * 86400) + ($hours * 3600))) / 60);
@@ -107,6 +101,7 @@ class EventListener implements Listener {
         }
     }
 
+    //Silent Join
     /**
      * @param PlayerJoinEvent $event
      * @priority HIGHEST
@@ -123,12 +118,14 @@ class EventListener implements Listener {
         }
     }
 
+    //Prevent people from changing world in staff mode (to prevent original inventory loss and other bugs) if there is a perworldinventory plugin
     /**
      * @param EntityLevelChangeEvent $event
      * @priority HIGHEST
      * @ignoreCancelled true
      */
-    public function onEntityTeleport(EntityLevelChangeEvent $event) : void{
+
+    public function onChangeWorld(EntityLevelChangeEvent $event) : void{
         if ($this->plugin->config->get("Allow-World-Change")) return;
         $player = $event->getEntity();
         if($player instanceof Player){
@@ -143,6 +140,7 @@ class EventListener implements Listener {
         }
     }
 
+    //Silent leave & leave staff mode
     /**
      * @param PlayerQuitEvent $event
      * @priority LOWEST
@@ -158,6 +156,7 @@ class EventListener implements Listener {
         }
     }
 
+    //Leave staff mode
     /**
      * @param PlayerKickEvent $event
      * @priority LOWEST
@@ -168,7 +167,9 @@ class EventListener implements Listener {
         $this->plugin->exitstaffmode($player);
     }
 
-    public function BlockBreakEvent(BlockBreakEvent $event){
+    //Prevent block break when frozen
+
+    public function onBreak(BlockBreakEvent $event){
         $player = $event->getPlayer();
         if($this->plugin->frozenstatus[$player->getName()]) {
             $event->setCancelled();
@@ -176,7 +177,9 @@ class EventListener implements Listener {
         }
     }
 
-    public function BlockPlaceEvent(BlockPlaceEvent $event){
+    //Prevent block place when frozen
+
+    public function onPlace(BlockPlaceEvent $event){
         $player = $event->getPlayer();
         if($this->plugin->frozenstatus[$player->getName()]) {
             $event->setCancelled();
@@ -184,7 +187,9 @@ class EventListener implements Listener {
         }
     }
 
-    public function PlayerDropItemEvent(PlayerDropItemEvent $event){
+    //Prevent item drop when frozen or in staffmode
+
+    public function onDropItem(PlayerDropItemEvent $event){
         $player = $event->getPlayer();
         if($this->plugin->staffmodestatus[$player->getName()]) {
             $event->setCancelled();
@@ -196,7 +201,9 @@ class EventListener implements Listener {
         }
     }
 
-    public function PlayerCommandPreprocessEvent(PlayerCommandPreprocessEvent $event){
+    //Prevent commands when frozen and chat when muted
+
+    public function onCommandPreprocess(PlayerCommandPreprocessEvent $event){
         $player = $event->getPlayer();
         $message = $event->getMessage();
         if($this->plugin->frozenstatus[$player->getName()]) {
@@ -229,7 +236,9 @@ class EventListener implements Listener {
         }
     }
 
-    public function EntityDamageEvent(EntityDamageEvent $event){
+    //Prevent dying when frozen
+
+    public function onDamage(EntityDamageEvent $event){
         $player = $event->getEntity();
         if ($player instanceof Player) {
             if($this->plugin->frozenstatus[$player->getName()]) {
@@ -238,7 +247,9 @@ class EventListener implements Listener {
         }
     }
 
-    public function EntityDamageByEntityEvent(EntityDamageByEntityEvent $event){
+    //Prevent getting hit or hitting when frozen & Freeze player by hitting them with freeze tool when in staff mode & Get player name when hitting player with anything else when in staffmode (To get name of invis people)
+
+    public function onHit(EntityDamageByEntityEvent $event){
         $attacker = $event->getDamager();
         $victim = $event->getEntity();
         if ($attacker instanceof Player) {
@@ -274,7 +285,9 @@ class EventListener implements Listener {
         }
     }
 
-    public function PlayerInteractEvent(PlayerInteractEvent $event){
+    //Prevent interaction when frozen & Use staffmode tools
+
+    public function onInteract(PlayerInteractEvent $event){
         $player = $event->getPlayer();
         if($this->plugin->frozenstatus[$player->getName()]) {
             $event->setCancelled();

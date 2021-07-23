@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Max\StaffMode\ui;
 
-use jojoe77777\FormAPI\{SimpleForm, CustomForm};
-use Max\StaffMode\EventListener;
+use jojoe77777\FormAPI\CustomForm;
 use pocketmine\{Player, Server};
 
 class FreezeForm {
@@ -22,13 +21,13 @@ class FreezeForm {
 
             if (count($this->plugin->getonlineplayersname()) == 0) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+				return true;
             }
 
             $target = Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["player"]]);
             if($target === null) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+				return true;
             }
             if ($data["unfreeze"] == false) {
                 $target->setImmobile(true);
@@ -41,6 +40,7 @@ class FreezeForm {
                 $this->plugin->frozenstatus[$target->getName()] = False;
                 $player->sendMessage("§7[§bStaffMode§7] §aSuccessfully unfroze player ".$target->getName());
             }
+			return true;
         });
         $form->setTitle("Freezing Menu");
         $form->addLabel("Toggle if you want to §lUnFreeze§r a player");

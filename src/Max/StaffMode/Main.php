@@ -4,44 +4,18 @@ declare(strict_types=1);
 
 namespace Max\StaffMode;
 
-use pocketmine\plugin\PluginBase;
-use pocketmine\event\Listener;
-
 use pocketmine\{Player, Server};
 use pocketmine\item\Item;
-use pocketmine\utils\{Config, TextFormat};
+use pocketmine\utils\{Config};
+use pocketmine\plugin\PluginBase;
 use pocketmine\command\{Command, CommandSender};
 use pocketmine\nbt\tag\StringTag;
-use pocketmine\network\mcpe\protocol\{TextPacket, LoginPacket};
 
-use jojoe77777\FormAPI\{SimpleForm, CustomForm};
-use CortexPE\DiscordWebhookAPI\{Message, Webhook, Embed};
 use Max\StaffMode\ui\{ReportForm, TeleportForm, PlayerInfoForm, WarnForm, FreezeForm, MuteForm, KickForm, BanForm};
-use Max\StaffMode\inv\{InvSee, EnderChestSee};
-use Max\StaffMode\EventListener;
-
 use muqsit\invmenu\InvMenuHandler;
 
 class Main extends PluginBase{
-    public $contents;
-    public $position;
-    public $gamemode;
-    public $staffmodestatus;
-    public $frozenstatus;
-    public $banList;
-    public $muteList;
-    public $history;
-    public $reportList;
-    public $alias;
-    public $config;
-    public $ReportForm;
-    public $TeleportForm;
-    public $PlayerInfoForm;
-    public $WarnForm;
-    public $FreezeForm;
-    public $MuteForm;
-    public $KickForm;
-    public $BanForm;
+    public $contents, $position, $gamemode, $staffmodestatus, $frozenstatus, $banList, $muteList, $history, $reportList, $alias, $config, $ReportForm, $TeleportForm, $PlayerInfoForm, $WarnForm, $FreezeForm, $MuteForm, $KickForm, $BanForm, $DefaultConfig;
 
     public function onEnable() {
         if(!InvMenuHandler::isRegistered()){
@@ -56,20 +30,52 @@ class Main extends PluginBase{
         $this->MuteForm = new MuteForm($this);
         $this->KickForm = new KickForm($this);
         $this->BanForm = new BanForm($this);
+
         if(!file_exists($this->getDataFolder())){
             mkdir($this->getDataFolder());
         }
-        $this->saveResource("config.yml");
         $this->banList = new Config($this->getDataFolder()."BanList.yml", Config::YAML);
         $this->muteList = new Config($this->getDataFolder()."MuteList.yml", Config::YAML);
         $this->history = new Config($this->getDataFolder()."History.yml", Config::YAML);
         $this->reportList = new Config($this->getDataFolder()."ReportList.yml", Config::YAML);
         $this->alias = new Config($this->getDataFolder()."Alias.yml", Config::YAML);
         $this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
-        if ($this->getServer()->getPluginManager()->getPlugin("PerWorldPlayer")) {
-            $this->config->set("Allow-World-Change", false);
-            $this->config->save();
-        }
+
+		$this->DefaultConfig = array(
+			"Allow-World-Change" => true,
+			"FakeLeave" => true,
+			"FakeLeave-Message" => "§e<player> left the game",
+			"FakeJoin" => false,
+			"FakeJoin-Message" => "§e<player> joined the game",
+			"SilentJoin" => true,
+			"SilentLeave" => false,
+			"DiscordWebhooks-Reports" => false,
+			"DiscordWebhooks-Reports-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
+			"DiscordWebhooks-Warnings" => false,
+			"DiscordWebhooks-Warnings-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
+			"DiscordWebhooks-Mutes" => false,
+			"DiscordWebhooks-Mutes-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
+			"DiscordWebhooks-Kicks" => false,
+			"DiscordWebhooks-Kicks-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
+			"DiscordWebhooks-Bans" => false,
+			"DiscordWebhooks-Bans-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3"
+		);
+
+		//Automatically update config file if plugin gets updated
+		if ($this->config->getAll() != $this->DefaultConfig) {
+			foreach ($this->DefaultConfig as $key => $data) {
+				if($this->config->exists($key)) {
+					$this->DefaultConfig[$key] = $this->config->get($key);
+				}
+			}
+			$this->config->setAll($this->DefaultConfig);
+			$this->config->save();
+		}
+
+		if ($this->getServer()->getPluginManager()->getPlugin("PerWorldPlayer")) {
+			$this->config->set("Allow-World-Change", false);
+			$this->config->save();
+		}
     }
 
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool{
@@ -88,7 +94,6 @@ class Main extends PluginBase{
             $this->getLogger()->info("§cYou can only use this command in the game.");
             return true;
         }
-        return false;
     }
 
     public function enterstaffmode(Player $player) {

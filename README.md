@@ -7,13 +7,13 @@
 StaffMode is an all-in-one Pocketmine-MP (PMMP) moderation plugin made to simplify the life of staff members.
 
 # Setup Guide
-1. To start using the plugin, download the StaffMode.phar file from poggit and put it into your server's plugins folder. 
+1. To start using the plugin, download the StaffMode.phar file from [poggit](https://poggit.pmmp.io/p/StaffMode) and put it into your server's plugins folder. (IMPORTANT: If you do not know how to handle virions, do not download from github, the plugin will not work) 
 2. Then, you have to do is set up your staff rank permissions. Look at the **Risk** tab in the following tables to decide which permissions is more suitable for which staff ranks to prevent possible abuse. It is recommended to give permissions with the *High* risk only to trusted staff members.
 3. The `staffmode.command.staffmode` or `staffmode.*` permission is necessary in order for staff to enter staff mode.
 
 | Permissions | Description | Default | Risk |
 | --- | --- | --- | --- |
-| `staffmode.*` | Allows usage of all staffmode features (including all the tools). | `op` | High |
+| `staffmode.*` | Allows usage of all staffmode features. | `op` | High |
 | `staffmode.command.staffmode` | Allows usage of the "/staffmode" command. | `op` | - |
 
 4. The folowing permissions are to access the tools within staffmode.
@@ -32,17 +32,13 @@ StaffMode is an all-in-one Pocketmine-MP (PMMP) moderation plugin made to simpli
 
 5. After setting up everything, if done correctly staff members will be able to do the /staffmode command and access all their allowed tools. 
 
-# Support
-Join the [discord server](https://discord.gg/YJZNhwhyMQ) for quick support, bug reports and feature requests.
-If you do not have discord please create an issue on github. Please keep in mind that it will take longer for me to reply on github. If you are reporting an issue with the plugin, be sure to include as many details as possible and steps to reproduce the issue.
-
 # Features
 - Features:
   - [x] /staffmode command
   - [x] /report command
   - [x] Teleportation tool
   - [x] Playerinfo tool
-  - [x] Invsee tool
+  - [x] Invsee subtool
   - [x] Warn tool
   - [x] Freeze tool
   - [x] Hit to freeze
@@ -51,15 +47,20 @@ If you do not have discord please create an issue on github. Please keep in mind
   - [x] Custom mute system
   - [x] Kick tool
   - [x] Ban tool
-  - [x] Custom ban system
-  - [x] Tool to exit staff mode
+  - [x] Custom ban system (Including: IpBans, DeviceBans)
+  - [x] Exit StaffMode tool
   - [x] Return to original location with the original inventory after exiting staffmode.
   - [x] Silent Join & Leave (Editable in config)
   - [x] Fake Join & Leave when entering/leaving StaffMode (Editable in config)
+  - [x] Remove player from server list when fake leaving
 - Coming soon...
   - [ ] Edit mute & bans
   - [ ] Close reports
   - [ ] Staff Chat
-  - [ ] More customization in config (Make all messages configurable)
+  - [ ] More customization in config (Maybe make all messages configurable)
   - [ ] Staff abuse prevention (Prevent staff from doing commands while in staffmode, prevent staff from banning other staff, etc.)
   - [ ] Please suggest anything you want me to add
+
+# Support
+Join the [discord server](https://discord.gg/YJZNhwhyMQ) for quick support, bug reports and feature requests.
+If you do not have discord, create an issue on github. Please keep in mind that it will take longer for me to reply on github. If you are reporting an issue with the plugin, be sure to include as much detail as possible and steps to reproduce the issue.

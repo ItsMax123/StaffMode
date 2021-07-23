@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Max\StaffMode\ui;
 
 use jojoe77777\FormAPI\{SimpleForm, CustomForm};
-use Max\StaffMode\EventListener;
 use pocketmine\{Player, Server};
+use CortexPE\DiscordWebhookAPI\{Message, Webhook, Embed};
 
 class BanForm {
     
@@ -26,7 +26,7 @@ class BanForm {
             } elseif( $data == "list") {
                 self::ListBanningForm($player);
             }
-
+			return true;
         });
         $form->setTitle("Banning Menu");
         $form->addButton("Ban", -1, "", "ban");
@@ -43,7 +43,7 @@ class BanForm {
 
             if (count($this->plugin->getbannedplayersname()) == 0) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+				return true;
             }
 
             $target = $this->plugin->getbannedplayersname()[$data["unbanplayer"]];
@@ -58,6 +58,7 @@ class BanForm {
             $this->plugin->banList->remove(strtolower($target));
             $this->plugin->banList->save();
             $player->sendMessage("§7[§bStaffMode§7] §aSuccessfully unbanned player ".$target);
+			return true;
         });
         $form->setTitle("UnBanning Menu");
         $form->addDropdown("Pick the player you want to unban", $this->plugin->getbannedplayersname(), null, "unbanplayer");
@@ -67,9 +68,7 @@ class BanForm {
 
     public function ListBanningForm(Player $player) : void {
         $form = new SimpleForm(function (Player $player, $data) {
-            if($data === null) {
-                return true;
-            }
+			return true;
         });
         $form->setTitle("Ban List");
         foreach ($this->plugin->banList->getAll() as $bannedplayersnamekey => $bannedplayersinfo) {
@@ -96,22 +95,22 @@ class BanForm {
 
             if($data["days"] == "0" and $data["hours"] == "0" and $data["minutes"] == "0" and $data["seconds"] == "0" and $data["forever"] == false) {
                 $player->sendMessage("§7[§bStaffMode§7] §cYou must specify an amount of time!");
-                return;
+				return true;
             }
 
             if($data["reason"] == "") {
                 $player->sendMessage("§7[§bStaffMode§7] §cYou must specify a reason!");
-                return;
+				return true;
             }
 
             if ($data["offlinename"] == "") {
                 if (count($this->plugin->getonlineplayersname()) == 0) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                    return;
+					return true;
                 }
                 if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                    return;
+					return true;
                 } else {
                     $target = $this->plugin->getonlineplayersname()[$data["name"]];
                 }
@@ -172,6 +171,7 @@ class BanForm {
                 $msg->addEmbed($embed);
                 $webHook->send($msg);
             }
+			return true;
         });
         $form->setTitle("Banning Menu");
         $form->addDropdown("Pick the player you want to ban", $this->plugin->getonlineplayersname(), null, "name");

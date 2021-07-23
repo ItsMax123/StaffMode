@@ -5,15 +5,10 @@ declare(strict_types=1);
 namespace Max\StaffMode\ui;
 
 use jojoe77777\FormAPI\{SimpleForm, CustomForm};
-use Max\StaffMode\EventListener;
 use pocketmine\{Player, Server};
-use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
-use pocketmine\nbt\tag\ByteTag;
 
-use muqsit\invmenu\inventories\BaseFakeInventory;
-use muqsit\invmenu\inventories\DoubleChestInventory;
 use muqsit\invmenu\InvMenu;
 
 class PlayerInfoForm {
@@ -37,6 +32,7 @@ class PlayerInfoForm {
             } elseif( $data == "enderchestsee") {
                 self::EnderchestSeeForm($player);
             }
+            return true;
         });
         $form->setTitle("Player Info Menu");
 
@@ -56,12 +52,12 @@ class PlayerInfoForm {
 
             if (count($this->plugin->getonlineplayersname()) == 0) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+                return true;
             }
 
             if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+                return true;
             } else {
                 $targetname = $this->plugin->getonlineplayersname()[$data["name"]];
             }
@@ -166,7 +162,7 @@ class PlayerInfoForm {
                 }
             }
             $menu->send($player);
-
+			return true;
         });
         $form->setTitle("Inventory Spy Menu");
         $form->addDropdown("Pick the player you want to see", $this->plugin->getonlineplayersname(), null, "name");
@@ -181,12 +177,12 @@ class PlayerInfoForm {
 
             if (count($this->plugin->getonlineplayersname()) == 0) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+                return true;
             }
 
             if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+                return true;
             } else {
                 $targetname = $this->plugin->getonlineplayersname()[$data["name"]];
             }
@@ -296,6 +292,7 @@ class PlayerInfoForm {
                 }
             }
             $menu->send($player);
+			return true;
         });
         $form->setTitle("Ender Chest Spy Menu");
         $form->addDropdown("Pick the player you want to see", $this->plugin->getonlineplayersname(), null, "name");
@@ -311,11 +308,11 @@ class PlayerInfoForm {
             if ($data["offlinename"] == "") {
                 if (count($this->plugin->getonlineplayersname()) == 0) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                    return;
+                    return true;
                 }
                 if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                    return;
+                    return true;
                 } else {
                     $target = $this->plugin->getonlineplayersname()[$data["name"]];
                 }
@@ -324,6 +321,7 @@ class PlayerInfoForm {
             }
 
             self::HistoryFormPartTwo($player, $target);
+			return true;
         });
         $form->setTitle("History Menu");
         $form->addDropdown("Pick the player you want to see", $this->plugin->getonlineplayersname(), null, "name");
@@ -334,9 +332,7 @@ class PlayerInfoForm {
 
     public function HistoryFormPartTwo(Player $player, string $target) : void {
         $form = new SimpleForm(function (Player $player, $data) use ($target) {
-            if($data === null) {
-                return true;
-            }
+			return true;
         });
         $form->setTitle("History Menu");
         if($this->plugin->history->exists(strtolower($target))){
@@ -366,9 +362,7 @@ class PlayerInfoForm {
 
     public function ReportsForm(Player $player) : void {
         $form = new SimpleForm(function (Player $player, $data) {
-            if($data === null) {
-                return true;
-            }
+			return true;
         });
         $form->setTitle("Reports Menu");
         if($this->plugin->reportList->exists("reports")){

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Max\StaffMode\ui;
 
 use jojoe77777\FormAPI\{SimpleForm, CustomForm};
-use Max\StaffMode\EventListener;
 use pocketmine\{Player, Server};
+use CortexPE\DiscordWebhookAPI\{Message, Webhook, Embed};
 
 class WarnForm {
     
@@ -22,18 +22,18 @@ class WarnForm {
 
             if (count($this->plugin->getonlineplayersname()) == 0) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+				return true;
             }
 
             $target = Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]);
             if($target === null) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+				return true;
             }
 
             if($data["reason"] == "") {
                 $player->sendMessage("§7[§bStaffMode§7] §cYou must specify a reason!");
-                return;
+				return true;
             }
 
             self::SendWarningForm($target, $data["reason"]);
@@ -60,6 +60,7 @@ class WarnForm {
                 $msg->addEmbed($embed);
                 $webHook->send($msg);
             }
+			return true;
         });
         $form->setTitle("Warning Menu");
         $form->addDropdown("Pick the player you want to warn", $this->plugin->getonlineplayersname(), null, "name");

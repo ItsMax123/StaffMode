@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Max\StaffMode\ui;
 
-use jojoe77777\FormAPI\{SimpleForm, CustomForm};
-use Max\StaffMode\EventListener;
+use jojoe77777\FormAPI\CustomForm;
 use pocketmine\{Player, Server};
+use CortexPE\DiscordWebhookAPI\{Message, Webhook, Embed};
 
 class ReportForm {
     
@@ -22,13 +22,13 @@ class ReportForm {
 
             if (count($this->plugin->getonlineplayersname()) == 0) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                return;
+                return true;
             }
 
             if ($data["offlinename"] == "") {
                 if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
-                    return;
+					return true;
                 } else {
                     $target = $this->plugin->getonlineplayersname()[$data["name"]];
                 }
@@ -38,7 +38,7 @@ class ReportForm {
 
             if($data["reason"] == "") {
                 $player->sendMessage("§7[§bStaffMode§7] §cYou must specify a reason!");
-                return;
+				return true;
             }
 
             if($this->plugin->history->exists(strtolower($target))){
@@ -73,6 +73,7 @@ class ReportForm {
                 $msg->addEmbed($embed);
                 $webHook->send($msg);
             }
+			return true;
         });
         $form->setTitle("Report Menu");
         $form->addDropdown("Pick the player you want to report", $this->plugin->getonlineplayersname(), null, "name");
