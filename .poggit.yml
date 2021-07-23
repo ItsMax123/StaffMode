@@ -4,13 +4,13 @@ branches:
 projects:
   StaffMode:
     path: ""
-    icon: "resources/admintools.png"
+    icon: "admintools.png"
     libs:
       - src: jojoe77777/FormAPI/libFormAPI
         version: ^1.3
-      - src: muqsit/invmenu/InvMenu
+      - src: muqsit\invmenu\InvMenu
         version: ^4.1.1
-      - src: CortexPE/DiscordWebhookAPI/DiscordWebhookAPI
+      - src: CortexPE\DiscordWebhookAPI\DiscordWebhookAPI
         version: ^1.0.1
     lint:
       phpstan: false
