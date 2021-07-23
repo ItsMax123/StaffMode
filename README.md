@@ -13,7 +13,7 @@ StaffMode is an all-in-one Pocketmine-MP (PMMP) moderation plugin made to simpli
 
 | Permissions | Description | Default | Risk |
 | --- | --- | --- | --- |
-| `staffmode.*` | Allows usage of all staffmode features. | `op` | High |
+| `staffmode.*` | Allows usage of all staffmode features (including all the tools). | `op` | High |
 | `staffmode.command.staffmode` | Allows usage of the "/staffmode" command. | `op` | - |
 
 4. The folowing permissions are to access the tools within staffmode.
@@ -22,10 +22,10 @@ StaffMode is an all-in-one Pocketmine-MP (PMMP) moderation plugin made to simpli
 | --- | --- | --- | --- |
 | `staffmode.silent` | Allows user to join and leave the server with no broadcasted message. | `op` | - |
 | `staffmode.tools.teleport` | Allows usage of the teleportation tool (compass) in staffmode. | `op` | Low |
-| `staffmode.tools.history` | Allows usage of the history tool (book) in staffmode. | `op` | - |
+| `staffmode.tools.playerinfo` | Allows usage of the playerinfo tool (book) in staffmode. | `op` | - |
 | `staffmode.tools.warn` | Allows usage of the warning tool (paper) in staffmode. | `op` | - |
 | `staffmode.tools.freeze` | Allows usage of the freezing tool (ice block) in staffmode. | `op` | Medium |
-| `staffmode.tools.unfreeze` | Allows usage of the unfreezing tool (fire) in staffmode. | `op` | Low |
+| `staffmode.tools.mute` | Allows usage of the muting tool (gold hoe) in staffmode. | `op` | Medium |
 | `staffmode.tools.kick` | Allows usage of the kicking tool (gold sword) in staffmode. | `op` | Medium |
 | `staffmode.tools.ban` | Allows usage of the banning tool (gold axe) in staffmode. | `op` | High |
 | `staffmode.tools.exit` | Allows usage of the exit tool (redstone torch) in staffmode. | `everyone` | - |
@@ -41,10 +41,14 @@ If you do not have discord please create an issue on github. Please keep in mind
   - [x] /staffmode command
   - [x] /report command
   - [x] Teleportation tool
-  - [x] History tool
+  - [x] Playerinfo tool
+  - [x] Invsee tool
   - [x] Warn tool
   - [x] Freeze tool
+  - [x] Hit to freeze
   - [x] Unfreeze tool
+  - [x] Mute tool
+  - [x] Custom mute system
   - [x] Kick tool
   - [x] Ban tool
   - [x] Custom ban system
@@ -53,9 +57,9 @@ If you do not have discord please create an issue on github. Please keep in mind
   - [x] Silent Join & Leave (Editable in config)
   - [x] Fake Join & Leave when entering/leaving StaffMode (Editable in config)
 - Coming soon...
-  - [ ] More customization in config
-  - [ ] Invsee tool
-  - [ ] Mute tool
-  - [ ] Custom mute system
-  - [ ] Staff abuse prevention (Prevent staff from doing commands while in staffmode)
+  - [ ] Edit mute & bans
+  - [ ] Close reports
+  - [ ] Staff Chat
+  - [ ] More customization in config (Make all messages configurable)
+  - [ ] Staff abuse prevention (Prevent staff from doing commands while in staffmode, prevent staff from banning other staff, etc.)
   - [ ] Please suggest anything you want me to add

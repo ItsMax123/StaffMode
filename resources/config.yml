@@ -1,3 +1,6 @@
+# Allow staff from changing worlds when teleporting to players. (IMPORTANT: Put 'false' if you have the PerWorldPlayer plugin or a similar plugin.)
+Allow-World-Change: true
+
 # Send a fake leave message whenever you go in StaffMode: 
 FakeLeave: true
 FakeLeave-Message: "§e<player> left the game"
@@ -6,6 +9,25 @@ FakeLeave-Message: "§e<player> left the game"
 FakeJoin: false
 FakeJoin-Message: "§e<player> joined the game"
 
-#This removes the join and leave message for players with the staffmode.silent permission.
+# This removes the join and leave message for players with the staffmode.silent permission.
 SilentJoin: true
 SilentLeave: false
+
+# Webhooks allow the plugin to send discord messages to your discord server.
+# For example, if you enable the reports webhooks, you will receive a message telling you which player has been reported, by whom and the reason.
+# All you have to do is go to your discord server's settings, go to "Intergration", click on "Webhooks", click on "New Webhook", select the channel you want the messages to be sent to and click "Copy Webhook URL".
+DiscordWebhooks-Reports: false # then replace the "false" to "true"
+DiscordWebhooks-Reports-Link: "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3" # Then remove this placeholder link and paste your link here
+
+# Finally, you can create new webhooks if you want the messages to be sent to different channels or you can use the same webhooks link for all the webhooks.
+DiscordWebhooks-Warnings: false
+DiscordWebhooks-Warnings-Link: "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3"
+
+DiscordWebhooks-Mutes: false
+DiscordWebhooks-Mutes-Link: "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3"
+
+DiscordWebhooks-Kicks: false
+DiscordWebhooks-Kicks-Link: "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3"
+
+DiscordWebhooks-Bans: false
+DiscordWebhooks-Bans-Link: "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3"

@@ -1,7 +1,7 @@
 name: StaffMode
 author: ItsMax123
 main: Max\StaffMode\Main
-version: 1.0.0
+version: 2.0.0
 api: [3.0.0]
 
 commands:
@@ -19,37 +19,52 @@ permissions:
   staffmode.command.report:
     default: true #Eveyone should be able to report players. If you dont want anyone to be able to report by default change this to "op".
     description: Allows usage of the "/report" command.
+
+  staffmode.bypass:
+    default: op
+    description: Allows usage of staffmode tools against other staff members.
+
   staffmode.*:
     default: op
     description: Allows usage of all staffmode features.
-    children: 
+    children:
+
       staffmode.command.staffmode:
         default: op
         description: Allows usage of the "/staffmode" command.
+
       staffmode.silent:
         default: op
         description: Allows player to join and leave the server with no broadcasted message.
+
       staffmode.tools.teleport:
         default: op
         description: Allows usage of the teleportation tool (compass) in staffmode.
-      staffmode.tools.history:
+
+      staffmode.tools.playerinfo:
         default: op
-        description: Allows usage of the history tool (book) in staffmode.
+        description: Allows usage of the PlayerInfo tool (book) in staffmode.
+
       staffmode.tools.warn:
         default: op
         description: Allows usage of the warning tool (paper) in staffmode.
+
       staffmode.tools.freeze:
         default: op
         description: Allows usage of the freezing tool (ice block) in staffmode.
-      staffmode.tools.unfreeze:
+
+      staffmode.tools.mute:
         default: op
-        description: Allows usage of the unfreezing tool (fire) in staffmode.
+        description: Allows usage of the muting tool (gold hoe) in staffmode.
+
       staffmode.tools.kick:
         default: op
         description: Allows usage of the kicking tool (gold sword) in staffmode.
+
       staffmode.tools.ban:
         default: op
         description: Allows usage of the banning tool (gold axe) in staffmode.
+
       staffmode.tools.exit:
         default: true #Eveyone should be able to leave staffmode in case they SOMEHOW get stuck in it.
         description: Allows usage of the exit tool (redstone torch) in staffmode.
