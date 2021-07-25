@@ -10,10 +10,11 @@ use pocketmine\Player;
 use pocketmine\item\Item;
 use pocketmine\network\mcpe\protocol\{LoginPacket};
 
-use pocketmine\event\player\{PlayerInteractEvent, PlayerCommandPreprocessEvent, PlayerDropItemEvent, PlayerKickEvent, PlayerJoinEvent, PlayerQuitEvent, PlayerPreLoginEvent};
+use pocketmine\event\player\{PlayerChatEvent, PlayerInteractEvent, PlayerCommandPreprocessEvent, PlayerDropItemEvent, PlayerKickEvent, PlayerJoinEvent, PlayerQuitEvent, PlayerPreLoginEvent};
 use pocketmine\event\entity\{EntityDamageEvent, EntityDamageByEntityEvent, EntityLevelChangeEvent};
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\server\DataPacketReceiveEvent;
+use pocketmine\Server;
 
 class EventListener implements Listener {
 
@@ -110,6 +111,7 @@ class EventListener implements Listener {
     public function onJoin(PlayerJoinEvent $event){
         $player = $event->getPlayer();
         $this->plugin->staffmodestatus[$player->getName()] = False;
+		$this->plugin->staffchatstatus[$player->getName()] = False;
         $this->plugin->frozenstatus[$player->getName()] = False;
         if($this->plugin->config->get("SilentJoin")){
             if($player->hasPermission("staffmode.silent")) {
@@ -235,6 +237,23 @@ class EventListener implements Listener {
             }
         }
     }
+
+    //StaffChat
+
+	public function onChat(PlayerChatEvent $event) {
+		$player = $event->getPlayer();
+		if ($this->plugin->staffchatstatus[$player->getName()]) {
+			$recipients = [];
+			foreach (Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
+				if ($onlinePlayer->hasPermission("staffmode.staffchat")) {
+					array_push($recipients, $onlinePlayer);
+				}
+			}
+			if (!$recipients) return;
+			$event->setFormat("§7[§3StaffChat§7] <§d".$player->getName()."§7>§r ".$event->getMessage());
+			$event->setRecipients($recipients);
+		}
+	}
 
     //Prevent dying when frozen
 

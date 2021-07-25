@@ -10,6 +10,11 @@ commands:
   usage: "/staffmode"
   aliases: ["sm"]
   permission: staffmode.command.staffmode
+ staffchat:
+    description: Puts you in staff chat.
+    usage: "/staffchat"
+    aliases: [ "sc" ]
+    permission: staffmode.staffchat
  report:
   description: Opens the report Interface.
   usage: "/report"
@@ -29,6 +34,9 @@ permissions:
       staffmode.command.staffmode:
         default: op
         description: Allows usage of the "/staffmode" command.
+      staffmode.staffchat:
+        default: op
+        description: Allows usage of the "/staffchat" command.
       staffmode.silent:
         default: op
         description: Allows player to join and leave the server with no broadcasted message.

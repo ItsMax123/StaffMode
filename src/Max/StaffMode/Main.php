@@ -15,7 +15,7 @@ use Max\StaffMode\ui\{ReportForm, TeleportForm, PlayerInfoForm, WarnForm, Freeze
 use muqsit\invmenu\InvMenuHandler;
 
 class Main extends PluginBase{
-    public $contents, $position, $gamemode, $staffmodestatus, $frozenstatus, $banList, $muteList, $history, $reportList, $alias, $config, $ReportForm, $TeleportForm, $PlayerInfoForm, $WarnForm, $FreezeForm, $MuteForm, $KickForm, $BanForm, $DefaultConfig;
+    public $contents, $position, $gamemode, $staffmodestatus, $staffchatstatus, $frozenstatus, $banList, $muteList, $history, $reportList, $alias, $config, $ReportForm, $TeleportForm, $PlayerInfoForm, $WarnForm, $FreezeForm, $MuteForm, $KickForm, $BanForm, $DefaultConfig;
 
     public function onEnable() {
         if(!InvMenuHandler::isRegistered()){
@@ -84,6 +84,9 @@ class Main extends PluginBase{
                 case "staffmode":
                     $this->enterstaffmode($sender);
                     return true;
+				case "staffchat":
+					$this->togglestaffchat($sender);
+					return true;
                 case "report":
                     $this->ReportForm->ReportForm($sender);
                     return true;
@@ -95,6 +98,16 @@ class Main extends PluginBase{
             return true;
         }
     }
+
+	public function togglestaffchat(Player $player) {
+		if(!$this->staffchatstatus[$player->getName()]) {
+			$this->staffchatstatus[$player->getName()] = True;
+			$player->sendMessage("§7[§bStaffMode§7] §aYou are now in staffchat.");
+		} else {
+			$this->staffchatstatus[$player->getName()] = False;
+			$player->sendMessage("§7[§bStaffMode§7] §aYou are no longer in staffchat.");
+		}
+	}
 
     public function enterstaffmode(Player $player) {
         if(!$this->staffmodestatus[$player->getName()]) {
