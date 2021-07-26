@@ -20,9 +20,11 @@ StaffMode is an all-in-one Pocketmine-MP (PMMP) moderation plugin made to simpli
 
 | Permissions | Description | Default | Risk |
 | --- | --- | --- | --- |
+| `staffmode.staffchat` | Allows usage of the "/staffchat" command. | `op` | - |
 | `staffmode.silent` | Allows user to join and leave the server with no broadcasted message. | `op` | - |
 | `staffmode.tools.teleport` | Allows usage of the teleportation tool (compass) in staffmode. | `op` | Low |
 | `staffmode.tools.playerinfo` | Allows usage of the playerinfo tool (book) in staffmode. | `op` | - |
+| `staffmode.tools.inventorymanager` | Allows usage of the InventoryManager tool (chest) in staffmode. | `op` | Medium |
 | `staffmode.tools.warn` | Allows usage of the warning tool (paper) in staffmode. | `op` | - |
 | `staffmode.tools.freeze` | Allows usage of the freezing tool (ice block) in staffmode. | `op` | Medium |
 | `staffmode.tools.mute` | Allows usage of the muting tool (gold hoe) in staffmode. | `op` | Medium |
@@ -38,7 +40,9 @@ StaffMode is an all-in-one Pocketmine-MP (PMMP) moderation plugin made to simpli
   - [x] /report command
   - [x] Teleportation tool
   - [x] Playerinfo tool
-  - [x] Invsee subtool
+  - [x] Inventory Spy tool
+  - [x] EnderChest spy
+  - [x] Inventory/EnderChest clear
   - [x] Warn tool
   - [x] Freeze tool
   - [x] Hit to freeze
