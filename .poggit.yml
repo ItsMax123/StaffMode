@@ -11,7 +11,7 @@ projects:
       - src: muqsit/invmenu/InvMenu
         version: ^4.1.1
       - src: CortexPE/DiscordWebhookAPI/DiscordWebhookAPI
-        version: ^1.0.1
+        version: 1.0.1
     lint:
       phpstan: false
 ...
