@@ -271,37 +271,35 @@ class EventListener implements Listener {
     public function onHit(EntityDamageByEntityEvent $event){
         $attacker = $event->getDamager();
         $victim = $event->getEntity();
-        if ($attacker instanceof Player) {
-            if($this->plugin->frozenstatus[$attacker->getName()]) {
-                $event->setCancelled();
-                $attacker->sendMessage("§7[§bStaffMode§7] §cCannot do that while frozen!");
-            }
-            if($this->plugin->staffmodestatus[$attacker->getName()]) {
-                if ($attacker->getInventory()->getItemInHand()->getId() == Item::PACKED_ICE) {
-                    if ($this->plugin->frozenstatus[$victim->getName()]) {
-                        $victim->setImmobile(false);
-                        $victim->sendTitle("§eUnfrozen", "§aYou can now move again.");
-                        $this->plugin->frozenstatus[$victim->getName()] = False;
-                        $attacker->sendMessage("§7[§bStaffMode§7] §aSuccessfully froze player ".$victim->getName());
-                        return;
-                    } else {
-                        $victim->setImmobile(true);
-                        $victim->sendTitle("§bFrozen", "§cDo not log off and listen to staff!");
-                        $this->plugin->frozenstatus[$victim->getName()] = True;
-                        $attacker->sendMessage("§7[§bStaffMode§7] §aSuccessfully unfroze player ".$victim->getName());
-                        return;
-                    }
-                } else {
-                    $attacker->sendMessage("§7[§bStaffMode§7] §aThe name of the player you just hit is: ".$event->getEntity()->getName());
-                }
-            }
-        }
-        if ($victim instanceof Player) {
-            if($this->plugin->frozenstatus[$victim->getName()]) {
-                $event->setCancelled();
-                $attacker->sendMessage("§7[§bStaffMode§7] §cCannot attack a frozen player!");
-            }
-        }
+        if (!$attacker instanceof Player) return;
+		if($this->plugin->frozenstatus[$attacker->getName()]) {
+			$event->setCancelled();
+			$attacker->sendMessage("§7[§bStaffMode§7] §cCannot do that while frozen!");
+		}
+		if (!$victim instanceof Player) return;
+		if($this->plugin->staffmodestatus[$attacker->getName()]) {
+			if ($attacker->getInventory()->getItemInHand()->getId() == Item::PACKED_ICE) {
+				if ($this->plugin->frozenstatus[$victim->getName()]) {
+					$victim->setImmobile(false);
+					$victim->sendTitle("§eUnfrozen", "§aYou can now move again.");
+					$this->plugin->frozenstatus[$victim->getName()] = False;
+					$attacker->sendMessage("§7[§bStaffMode§7] §aSuccessfully froze player ".$victim->getName());
+					return;
+				} else {
+					$victim->setImmobile(true);
+					$victim->sendTitle("§bFrozen", "§cDo not log off and listen to staff!");
+					$this->plugin->frozenstatus[$victim->getName()] = True;
+					$attacker->sendMessage("§7[§bStaffMode§7] §aSuccessfully unfroze player ".$victim->getName());
+					return;
+				}
+			} else {
+				$attacker->sendMessage("§7[§bStaffMode§7] §aThe name of the player you just hit is: ".$event->getEntity()->getName());
+			}
+		}
+		if($this->plugin->frozenstatus[$victim->getName()]) {
+			$event->setCancelled();
+			$attacker->sendMessage("§7[§bStaffMode§7] §cCannot attack a frozen player!");
+		}
     }
 
     //Prevent interaction when frozen & Use staffmode tools
