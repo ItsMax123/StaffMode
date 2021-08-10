@@ -47,7 +47,7 @@ class WarnForm {
             $this->plugin->history->save();
             $player->sendMessage("§7[§bStaffMode§7] §aSuccessfully warned player ".$target->getName());
 
-            if ($this->plugin->config->get("DiscordWebhooks-Warnings") == true) {
+            if ($this->plugin->config->get("DiscordWebhooks-Warnings")) {
                 $webHook = new Webhook($this->plugin->config->get("DiscordWebhooks-Warnings-Link"));
                 $msg = new Message();
                 $msg->setUsername("StaffMode-Warnings");
@@ -62,7 +62,7 @@ class WarnForm {
             }
 			return true;
         });
-        $form->setTitle("Warning Menu");
+        $form->setTitle("Warning Form");
         $form->addDropdown("Pick the player you want to warn", $this->plugin->getonlineplayersname(), null, "name");
         $form->addInput("Reason of warn:", "Ex.: Inappropriate Build", "", "reason");
 

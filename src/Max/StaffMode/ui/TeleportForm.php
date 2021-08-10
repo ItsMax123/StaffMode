@@ -38,7 +38,7 @@ class TeleportForm {
             }
 			return true;
         });
-        $form->setTitle("Teleportation Menu");
+        $form->setTitle("Teleportation Form");
         $from = $player->getLevel();
         foreach(Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
             if(!$this->plugin->config->get("Allow-World-Change")){
