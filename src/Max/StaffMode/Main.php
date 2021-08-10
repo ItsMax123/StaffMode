@@ -11,20 +11,25 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\command\{Command, CommandSender};
 use pocketmine\nbt\tag\StringTag;
 
-use Max\StaffMode\ui\{ReportForm, TeleportForm, PlayerInfoForm, WarnForm, FreezeForm, MuteForm, KickForm, BanForm};
+use jojoe77777\FormAPI\Form;
+use muqsit\invmenu\InvMenu;
+use CortexPE\DiscordWebhookAPI\Webhook;
+use Max\StaffMode\ui\{ReportForm, TeleportForm, PlayerInfoForm, InventoryManagerForm, WarnForm, FreezeForm, MuteForm, KickForm, BanForm};
 use muqsit\invmenu\InvMenuHandler;
 
 class Main extends PluginBase{
-    public $contents, $position, $gamemode, $staffmodestatus, $staffchatstatus, $frozenstatus, $banList, $muteList, $history, $reportList, $alias, $config, $ReportForm, $TeleportForm, $PlayerInfoForm, $WarnForm, $FreezeForm, $MuteForm, $KickForm, $BanForm, $DefaultConfig;
+    public $contents, $position, $gamemode, $staffmodestatus, $staffchatstatus, $frozenstatus, $banList, $muteList, $history, $reportList, $alias, $config, $ReportForm, $TeleportForm, $PlayerInfoForm, $InventoryManagerForm, $WarnForm, $FreezeForm, $MuteForm, $KickForm, $BanForm, $DefaultConfig;
 
     public function onEnable() {
         if(!InvMenuHandler::isRegistered()){
             InvMenuHandler::register($this);
         }
+
         new EventListener($this);
         $this->ReportForm = new ReportForm($this);
         $this->TeleportForm = new TeleportForm($this);
         $this->PlayerInfoForm = new PlayerInfoForm($this);
+		$this->InventoryManagerForm = new InventoryManagerForm($this);
         $this->WarnForm = new WarnForm($this);
         $this->FreezeForm = new FreezeForm($this);
         $this->MuteForm = new MuteForm($this);
@@ -34,6 +39,19 @@ class Main extends PluginBase{
         if(!file_exists($this->getDataFolder())){
             mkdir($this->getDataFolder());
         }
+		foreach (
+			[
+				"DiscordWebhookAPI" => Webhook::class,
+				"InvMenu" => InvMenu::class,
+				"libFormAPI" => Form::class
+			] as $virion => $class
+		) {
+			if (!class_exists($class)) {
+				$this->getLogger()->error($virion . " virion was not found. Make sure to keep your pocketmine updated and download the plugin from https://poggit.pmmp.io/p/StaffMode/ ");
+				$this->getServer()->getPluginManager()->disablePlugin($this);
+				return;
+			}
+		}
         $this->banList = new Config($this->getDataFolder()."BanList.yml", Config::YAML);
         $this->muteList = new Config($this->getDataFolder()."MuteList.yml", Config::YAML);
         $this->history = new Config($this->getDataFolder()."History.yml", Config::YAML);
@@ -43,6 +61,8 @@ class Main extends PluginBase{
 
 		$this->DefaultConfig = array(
 			"Allow-World-Change" => true,
+			"Allow-Inventory-Clear" => true,
+			"Allow-EnderChest-Clear" => true,
 			"FakeLeave" => true,
 			"FakeLeave-Message" => "§e<player> left the game",
 			"FakeJoin" => false,
@@ -53,6 +73,10 @@ class Main extends PluginBase{
 			"DiscordWebhooks-Reports-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
 			"DiscordWebhooks-Warnings" => false,
 			"DiscordWebhooks-Warnings-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
+			"DiscordWebhooks-Inventory-Clears" => false,
+			"DiscordWebhooks-Inventory-Clears-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
+			"DiscordWebhooks-EnderChest-Clears" => false,
+			"DiscordWebhooks-EnderChest-Clears-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
 			"DiscordWebhooks-Mutes" => false,
 			"DiscordWebhooks-Mutes-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
 			"DiscordWebhooks-Kicks" => false,
@@ -122,7 +146,7 @@ class Main extends PluginBase{
 
             //Fake Leave message
             if($this->config->get("FakeLeave")){
-                Server::getInstance()->removeOnlinePlayer($player);
+                Server::getInstance()->removePlayerListData($player->getUniqueId());
                 $message = $this->getConfig()->get("FakeLeave-Message");
                 $name = $player->getName();
                 $message = str_replace("<player>", "$name", $message);
@@ -142,41 +166,48 @@ class Main extends PluginBase{
             $book->setNamedTagEntry(new StringTag("staffmode", "true"));
             $book->setLore(["§rRight click to open player info menu."]);
             $player->getInventory()->setItem(1, $book);
+
+			//CHEST | INVENTORY MANAGER
+			$chest = Item::get(Item::CHEST, 0, 1);
+			$chest->setCustomName("§aInventory Manager");
+			$chest->setNamedTagEntry(new StringTag("staffmode", "true"));
+			$chest->setLore(["§rRight click to open inventory manager menu."]);
+			$player->getInventory()->setItem(2, $chest);
     
             //PAPER | WARN THE PLAYER
-            $fire = Item::get(Item::PAPER, 0, 1);
-            $fire->setCustomName("§dWarn a player");
-            $fire->setNamedTagEntry(new StringTag("staffmode", "true"));
-            $fire->setLore(["§rRight click to open warning menu."]);
-            $player->getInventory()->setItem(2, $fire);
+            $paper = Item::get(Item::PAPER, 0, 1);
+			$paper->setCustomName("§dWarn a player");
+			$paper->setNamedTagEntry(new StringTag("staffmode", "true"));
+			$paper->setLore(["§rRight click to open warning menu."]);
+            $player->getInventory()->setItem(3, $paper);
     
             //ICE BLOCK | FREEZE THE PLAYER
             $ice = Item::get(Item::PACKED_ICE, 0, 1);
             $ice->setCustomName("§bFreeze a player");
             $ice->setNamedTagEntry(new StringTag("staffmode", "true"));
             $ice->setLore(["§rRight click to open freezing menu.\nHit a player to freeze them."]);
-            $player->getInventory()->setItem(3, $ice);
+            $player->getInventory()->setItem(4, $ice);
                 
             //GOLD HOE | MUTE THE PLAYER
             $ghoe = Item::get(Item::GOLDEN_HOE, 0, 1);
             $ghoe->setCustomName("§6Mute a player");
             $ghoe->setNamedTagEntry(new StringTag("staffmode", "true"));
             $ghoe->setLore(["§rRight click to open muting menu."]);
-            $player->getInventory()->setItem(4, $ghoe);
+            $player->getInventory()->setItem(5, $ghoe);
     
             //GOLD SWORD | KICK THE PLAYER
             $gsword = Item::get(Item::GOLDEN_SWORD, 0, 1);
             $gsword->setCustomName("§cKick a player");
             $gsword->setNamedTagEntry(new StringTag("staffmode", "true"));
             $gsword->setLore(["§rRight click to open kicking menu."]);
-            $player->getInventory()->setItem(5, $gsword);
+            $player->getInventory()->setItem(6, $gsword);
     
             //GOLD AXE | BAN THE PLAYER
             $gaxe = Item::get(Item::GOLDEN_AXE, 0, 1);
             $gaxe->setCustomName("§4Ban a player");
             $gaxe->setNamedTagEntry(new StringTag("staffmode", "true"));
             $gaxe->setLore(["§rRight click to open banning menu."]);
-            $player->getInventory()->setItem(6, $gaxe);
+            $player->getInventory()->setItem(7, $gaxe);
     
             //REDSTONE_TORCH | EXIT STAFF MODE
             $rtorch = Item::get(Item::LIT_REDSTONE_TORCH, 0, 1);
@@ -187,23 +218,20 @@ class Main extends PluginBase{
         }
     }
 
-    public function exitstaffmode(Player $player) {
-        if($this->staffmodestatus[$player->getName()]) {
-            $player->getInventory()->setContents($this->contents[$player->getName()]);
-            $player->teleport($this->position[$player->getName()]);
-            $player->setGamemode($this->gamemode[$player->getName()]);
-            $this->staffmodestatus[$player->getName()] = False;
-            Server::getInstance()->addOnlinePlayer($player);
-            $player->sendPopup("§cYou are no longer in staffmode.");
+    public function exitstaffmode(Player $player, string $playername) {
+    	$player->getInventory()->setContents($this->contents[$playername]);
+    	$player->teleport($this->position[$playername]);
+    	$player->setGamemode($this->gamemode[$playername]);
+    	$this->staffmodestatus[$playername] = False;
+    	Server::getInstance()->addOnlinePlayer($player);
+    	$player->sendPopup("§cYou are no longer in staffmode.");
 
-            //Fake join message
-            if($this->config->get("FakeJoin")){
-                $message = $this->getConfig()->get("FakeJoin-Message");
-                $name = $player->getName();
-                $message = str_replace("<player>", "$name", $message);
-                $this->getServer()->broadcastMessage($message);
-            }
-        }
+    	//Fake join message
+		if($this->config->get("FakeJoin")){
+			$message = $this->getConfig()->get("FakeJoin-Message");
+			$message = str_replace("<player>", "$playername", $message);
+			$this->getServer()->broadcastMessage($message);
+		}
     }
 
     public function getonlineplayersname() {

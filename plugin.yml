@@ -1,7 +1,7 @@
 name: StaffMode
 author: ItsMax123
 main: Max\StaffMode\Main
-version: 2.0.1
+version: 2.1.1
 api: [3.0.0]
 
 commands:
@@ -21,46 +21,108 @@ commands:
   permission: staffmode.command.report
 
 permissions:
+
   staffmode.command.report:
     default: true
     description: Allows usage of the "/report" command.
+
   staffmode.bypass:
     default: op
     description: Allows usage of staffmode tools against other staff members.
+
+  staffmode.see:
+    default: op
+    description: Allows user to see staff members that have fake left in the player list.
+
   staffmode.*:
     default: op
     description: Allows usage of all staffmode features.
     children:
+
       staffmode.command.staffmode:
         default: op
         description: Allows usage of the "/staffmode" command.
+
       staffmode.staffchat:
         default: op
         description: Allows usage of the "/staffchat" command.
+
       staffmode.silent:
         default: op
-        description: Allows player to join and leave the server with no broadcasted message.
+        description: Allows user to join and leave the server with no broadcasted message.
+
       staffmode.tools.teleport:
         default: op
         description: Allows usage of the teleportation tool (compass) in staffmode.
+
       staffmode.tools.playerinfo:
         default: op
         description: Allows usage of the PlayerInfo tool (book) in staffmode.
+        children:
+          staffmode.tools.playerinfo.history:
+            default: op
+            description: Allows usage of the History (sub-tool of PlayerInfo tool) in staffmode.
+          staffmode.tools.playerinfo.reports:
+            default: op
+            description: Allows usage of the Reports (sub-tool of PlayerInfo tool) in staffmode.
+
+      staffmode.tools.inventorymanager:
+        default: op
+        description: Allows usage of the InventoryManager tool (chest) in staffmode.
+        children:
+          staffmode.tools.inventorymanager.invspy:
+            default: op
+            description: Allows usage of the Inventory Spy (sub-tool of InventoryManager tool) in staffmode.
+          staffmode.tools.inventorymanager.enderchestspy:
+            default: op
+            description: Allows usage of the EnderChest Spy (sub-tool of InventoryManager tool) in staffmode.
+          staffmode.tools.inventorymanager.invclear:
+            default: op
+            description: Allows usage of the Inventory Clear (sub-tool of InventoryManager tool) in staffmode.
+          staffmode.tools.inventorymanager.enderchestclear:
+            default: op
+            description: Allows usage of the EnderChest Clear (sub-tool of InventoryManager tool) in staffmode.
+
       staffmode.tools.warn:
         default: op
         description: Allows usage of the warning tool (paper) in staffmode.
+
       staffmode.tools.freeze:
         default: op
         description: Allows usage of the freezing tool (ice block) in staffmode.
+
       staffmode.tools.mute:
         default: op
         description: Allows usage of the muting tool (gold hoe) in staffmode.
+        children:
+          staffmode.tools.mute.mute:
+            default: op
+            description: Allows usage of the Mute (sub-tool of Mute tool) in staffmode.
+          staffmode.tools.mute.unmute:
+            default: op
+            description: Allows usage of the Unmute (sub-tool of Mute tool) in staffmode.
+          staffmode.tools.mute.mutelist:
+            default: op
+            description: Allows usage of the Mute List (sub-tool of Mute tool) in staffmode.
+
       staffmode.tools.kick:
         default: op
         description: Allows usage of the kicking tool (gold sword) in staffmode.
+
       staffmode.tools.ban:
         default: op
         description: Allows usage of the banning tool (gold axe) in staffmode.
+        children:
+          staffmode.tools.ban.ban:
+            default: op
+            description: Allows usage of the Ban (sub-tool of Ban tool) in staffmode.
+          staffmode.tools.ban.unban:
+            default: op
+            description: Allows usage of the Unban (sub-tool of Ban tool) in staffmode.
+          staffmode.tools.ban.banlist:
+            default: op
+            description: Allows usage of the Ban List (sub-tool of Ban tool) in staffmode.
+
       staffmode.tools.exit:
         default: true
         description: Allows usage of the exit tool (redstone torch) in staffmode.

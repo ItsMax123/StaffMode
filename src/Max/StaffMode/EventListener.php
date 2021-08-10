@@ -13,7 +13,7 @@ use pocketmine\network\mcpe\protocol\{LoginPacket};
 use pocketmine\event\player\{PlayerChatEvent, PlayerInteractEvent, PlayerCommandPreprocessEvent, PlayerDropItemEvent, PlayerKickEvent, PlayerJoinEvent, PlayerQuitEvent, PlayerPreLoginEvent};
 use pocketmine\event\entity\{EntityDamageEvent, EntityDamageByEntityEvent, EntityLevelChangeEvent};
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
-use pocketmine\event\server\DataPacketReceiveEvent;
+use pocketmine\event\server\{DataPacketReceiveEvent, QueryRegenerateEvent};
 use pocketmine\Server;
 
 class EventListener implements Listener {
@@ -73,22 +73,29 @@ class EventListener implements Listener {
             }
         }
         foreach ($this->plugin->banList->getAll() as $bannedplayerinfo) {
-            if (isset($bannedplayerinfo["IPAddress"])) {
-                $BannedAddress = $bannedplayerinfo["IPAddress"];
-                $BannedDeviceId = $bannedplayerinfo["DeviceId"];
-                $BannedSelfSignedId = $bannedplayerinfo["SelfSignedId"];
-                $BannedClientRandomId = $bannedplayerinfo["ClientRandomId"];
-    
+            if (isset($bannedplayerinfo["adress"])) {
+            	var_dump($bannedplayerinfo);
+                $BannedAddress = $bannedplayerinfo["adress"];
+                $BannedDeviceId = $bannedplayerinfo["deviceid"];
+                $BannedSelfSignedId = $bannedplayerinfo["selfsignedid"];
+				var_dump($BannedAddress);
+				var_dump($BannedDeviceId);
+				var_dump($BannedSelfSignedId);
                 $PlayerAddress = $this->plugin->alias->get(strtolower($player->getName()))["IPAddress"];
                 $PlayerDeviceId = $this->plugin->alias->get(strtolower($player->getName()))["DeviceId"];
                 $PlayerSelfSignedId = $this->plugin->alias->get(strtolower($player->getName()))["SelfSignedId"];
-                $PlayerClientRandomId = $this->plugin->alias->get(strtolower($player->getName()))["ClientRandomId"];
-                if(($BannedAddress == $PlayerAddress)OR($BannedDeviceId == $PlayerDeviceId)OR($BannedSelfSignedId == $PlayerSelfSignedId)OR($BannedClientRandomId == $PlayerClientRandomId)) {
+				var_dump($PlayerAddress);
+				var_dump($PlayerDeviceId);
+				var_dump($PlayerSelfSignedId);
+                if(($BannedAddress == $PlayerAddress)OR($BannedDeviceId == $PlayerDeviceId)OR($BannedSelfSignedId == $PlayerSelfSignedId)) {
+					var_dump(3);
                     $staff = $bannedplayerinfo["staff"];
                     $reason = $bannedplayerinfo["reason"];
                     if((((int)$bannedplayerinfo["unbantime"]) - ((int)$bannedplayerinfo["time"])) == -1) {
+						var_dump(4);
                         $player->close("", "§cYou are banned!\n§rBy: ".$staff."\nReason: ".$reason."\nDuration: Forever");
                     } else {
+						var_dump(5);
                         $time = ((int)$bannedplayerinfo["unbantime"] - time());
                         $days = (int)($time / 86400);
                         $hours = (int)(($time - ($days * 86400)) / 3600);
@@ -96,6 +103,7 @@ class EventListener implements Listener {
                         $seconds = (int)($time - (($days * 86400) + ($hours * 3600) + ($minutes * 60)));
                         $player->close("", "§cYou are banned!\n§rBy: ".$staff."\nReason: ".$reason."\nTime left: ".$days."d, ".$hours."h, ".$minutes."m, ".$seconds."s");
                     }
+					var_dump(6);
                     $event->setCancelled();
                 }
             }
@@ -113,12 +121,32 @@ class EventListener implements Listener {
         $this->plugin->staffmodestatus[$player->getName()] = False;
 		$this->plugin->staffchatstatus[$player->getName()] = False;
         $this->plugin->frozenstatus[$player->getName()] = False;
-        if($this->plugin->config->get("SilentJoin")){
-            if($player->hasPermission("staffmode.silent")) {
-                $event->setJoinMessage(null);
-            }
-        }
+        if($this->plugin->config->get("SilentJoin")) {
+			if ($player->hasPermission("staffmode.silent")) {
+				$event->setJoinMessage(null);
+			}
+		}
+		foreach(Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
+			if($this->plugin->staffmodestatus[$onlinePlayer->getName()]) {
+				Server::getInstance()->removePlayerListData($onlinePlayer->getUniqueId());
+			}
+		}
     }
+
+	public function onQuery(QueryRegenerateEvent $event) {
+		$visibleplayers = [];
+		foreach(Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
+			if (isset($this->plugin->staffmodestatus[$onlinePlayer->getName()])) {
+				if ($this->plugin->staffmodestatus[$onlinePlayer->getName()]) {
+					$online = $event->getPlayerCount();
+					$event->setPlayerCount($online - 1);
+				} else {
+					array_push($visibleplayers, $onlinePlayer);
+				}
+			}
+		}
+		$event->setPlayerList($visibleplayers);
+	}
 
     //Prevent people from changing world in staff mode (to prevent original inventory loss and other bugs) if there is a perworldinventory plugin
     /**
@@ -150,7 +178,9 @@ class EventListener implements Listener {
 
     public function onQuit(PlayerQuitEvent $event){
         $player = $event->getPlayer();
-        $this->plugin->exitstaffmode($player);
+		if($this->plugin->staffmodestatus[$player->getName()]) {
+			$this->plugin->exitstaffmode($player, $player->getName());
+		}
         if($this->plugin->config->get("SilentLeave")){
             if ($player->hasPermission("staffmode.silent")) {
                 $event->setQuitMessage(null);
@@ -166,7 +196,9 @@ class EventListener implements Listener {
 
     public function onKick(PlayerKickEvent $event){
         $player = $event->getPlayer();
-        $this->plugin->exitstaffmode($player);
+		if($this->plugin->staffmodestatus[$player->getName()]) {
+			$this->plugin->exitstaffmode($player, $player->getName());
+		}
     }
 
     //Prevent block break when frozen
@@ -271,37 +303,35 @@ class EventListener implements Listener {
     public function onHit(EntityDamageByEntityEvent $event){
         $attacker = $event->getDamager();
         $victim = $event->getEntity();
-        if ($attacker instanceof Player) {
-            if($this->plugin->frozenstatus[$attacker->getName()]) {
-                $event->setCancelled();
-                $attacker->sendMessage("§7[§bStaffMode§7] §cCannot do that while frozen!");
-            }
-            if($this->plugin->staffmodestatus[$attacker->getName()]) {
-                if ($attacker->getInventory()->getItemInHand()->getId() == Item::PACKED_ICE) {
-                    if ($this->plugin->frozenstatus[$victim->getName()]) {
-                        $victim->setImmobile(false);
-                        $victim->sendTitle("§eUnfrozen", "§aYou can now move again.");
-                        $this->plugin->frozenstatus[$victim->getName()] = False;
-                        $attacker->sendMessage("§7[§bStaffMode§7] §aSuccessfully froze player ".$victim->getName());
-                        return;
-                    } else {
-                        $victim->setImmobile(true);
-                        $victim->sendTitle("§bFrozen", "§cDo not log off and listen to staff!");
-                        $this->plugin->frozenstatus[$victim->getName()] = True;
-                        $attacker->sendMessage("§7[§bStaffMode§7] §aSuccessfully unfroze player ".$victim->getName());
-                        return;
-                    }
-                } else {
-                    $attacker->sendMessage("§7[§bStaffMode§7] §aThe name of the player you just hit is: ".$event->getEntity()->getName());
-                }
-            }
-        }
-        if ($victim instanceof Player) {
-            if($this->plugin->frozenstatus[$victim->getName()]) {
-                $event->setCancelled();
-                $attacker->sendMessage("§7[§bStaffMode§7] §cCannot attack a frozen player!");
-            }
-        }
+        if (!$attacker instanceof Player) return;
+		if($this->plugin->frozenstatus[$attacker->getName()]) {
+			$event->setCancelled();
+			$attacker->sendMessage("§7[§bStaffMode§7] §cCannot do that while frozen!");
+		}
+		if (!$victim instanceof Player) return;
+		if($this->plugin->staffmodestatus[$attacker->getName()]) {
+			if ($attacker->getInventory()->getItemInHand()->getId() == Item::PACKED_ICE) {
+				if ($this->plugin->frozenstatus[$victim->getName()]) {
+					$victim->setImmobile(false);
+					$victim->sendTitle("§eUnfrozen", "§aYou can now move again.");
+					$this->plugin->frozenstatus[$victim->getName()] = False;
+					$attacker->sendMessage("§7[§bStaffMode§7] §aSuccessfully froze player ".$victim->getName());
+					return;
+				} else {
+					$victim->setImmobile(true);
+					$victim->sendTitle("§bFrozen", "§cDo not log off and listen to staff!");
+					$this->plugin->frozenstatus[$victim->getName()] = True;
+					$attacker->sendMessage("§7[§bStaffMode§7] §aSuccessfully unfroze player ".$victim->getName());
+					return;
+				}
+			} else {
+				$attacker->sendMessage("§7[§bStaffMode§7] §aThe name of the player you just hit is: ".$event->getEntity()->getName());
+			}
+		}
+		if($this->plugin->frozenstatus[$victim->getName()]) {
+			$event->setCancelled();
+			$attacker->sendMessage("§7[§bStaffMode§7] §cCannot attack a frozen player!");
+		}
     }
 
     //Prevent interaction when frozen & Use staffmode tools
@@ -329,7 +359,13 @@ class EventListener implements Listener {
                     } else {
                         $player->sendMessage("§7[§bStaffMode§7] §cYou do not have permission to use this tool.");
                     }
-                } elseif($item->getId() == Item::PAPER) {
+                } elseif($item->getId() == Item::CHEST) {
+					if ($player->hasPermission("staffmode.tools.inventorymanager")) {
+						$this->plugin->InventoryManagerForm->InventoryManagerForm($player);
+					} else {
+						$player->sendMessage("§7[§bStaffMode§7] §cYou do not have permission to use this tool.");
+					}
+				} elseif($item->getId() == Item::PAPER) {
                     if ($player->hasPermission("staffmode.tools.warn")) {
                         $this->plugin->WarnForm->WarningForm($player);
                     } else {
@@ -361,7 +397,9 @@ class EventListener implements Listener {
                     }
                 } elseif($item->getId() == Item::LIT_REDSTONE_TORCH) {
                     if ($player->hasPermission("staffmode.tools.exit")) {
-                        $this->plugin->exitstaffmode($player);
+						if($this->plugin->staffmodestatus[$player->getName()]) {
+							$this->plugin->exitstaffmode($player, $player->getName());
+						}
                     } else {
                         $player->sendMessage("§7[§bStaffMode§7] §cYou do not have permission to use this tool.");
                     }

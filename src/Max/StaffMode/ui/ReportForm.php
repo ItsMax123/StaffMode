@@ -60,7 +60,7 @@ class ReportForm {
             $this->plugin->reportList->save();
 
             $player->sendMessage("§7[§bStaffMode§7] §aSuccessfully reported player ".$target);
-            if ($this->plugin->config->get("DiscordWebhooks-Reports") == true) {
+            if ($this->plugin->config->get("DiscordWebhooks-Reports")) {
                 $webHook = new Webhook($this->plugin->config->get("DiscordWebhooks-Reports-Link"));
                 $msg = new Message();
                 $msg->setUsername("StaffMode-Reports");
@@ -75,7 +75,7 @@ class ReportForm {
             }
 			return true;
         });
-        $form->setTitle("Report Menu");
+        $form->setTitle("Report Form");
         $form->addDropdown("Pick the player you want to report", $this->plugin->getonlineplayersname(), null, "name");
         $form->addInput("Or type the §lEXACT§r name of the player you want to report", "Ex.: ".$player->getName(), "", "offlinename");
         $form->addInput("Reason:", "Ex.: Hacking", "", "reason");

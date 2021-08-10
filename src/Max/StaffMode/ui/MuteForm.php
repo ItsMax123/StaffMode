@@ -62,7 +62,7 @@ class MuteForm {
             $player->sendMessage("§7[§bStaffMode§7] §aSuccessfully unmuted player ".$target);
 			return true;
         });
-        $form->setTitle("UnMuting Menu");
+        $form->setTitle("UnMuting Form");
         $form->addDropdown("Pick the player you want to unmute", $this->plugin->getmutedplayersname(), null, "unmuteplayer");
         $form->addInput("Reason:", "Ex.: False Mute", "", "reason");
         $player->sendForm($form);
@@ -95,7 +95,7 @@ class MuteForm {
                 return true;
             }
 
-            if($data["days"] == "0" and $data["hours"] == "0" and $data["minutes"] == "0" and $data["seconds"] == "0" and $data["forever"] == false) {
+            if($data["days"] == "0" and $data["hours"] == "0" and $data["minutes"] == "0" and $data["seconds"] == "0" and !$data["forever"]) {
                 $player->sendMessage("§7[§bStaffMode§7] §cYou must specify an amount of time!");
 				return true;
             }
@@ -120,7 +120,7 @@ class MuteForm {
                 $target = $data["offlinename"];
             }
 
-            if ($data["forever"] == false) {
+            if (!$data["forever"]) {
                 $time = (((int)$data["days"] * 86400) + ((int)$data["hours"] * 3600) + ((int)$data["minutes"] * 60) + ((int)$data["seconds"]));
                 $days = (int)$data["days"];
                 $hours = (int)$data["hours"];
@@ -147,7 +147,7 @@ class MuteForm {
             $this->plugin->history->save();
             $player->sendMessage("§7[§bStaffMode§7] §aSuccessfully muted player ".$target);
 
-            if ($this->plugin->config->get("DiscordWebhooks-Mutes") == true) {
+            if ($this->plugin->config->get("DiscordWebhooks-Mutes")) {
                 $webHook = new Webhook($this->plugin->config->get("DiscordWebhooks-Mutes-Link"));
                 $msg = new Message();
                 $msg->setUsername("StaffMode-Mutes");
@@ -157,7 +157,7 @@ class MuteForm {
                 $embed->setColor(0x00FF00);
                 $embed->addField("Muted by", $player->getName());
                 $embed->addField("Reason", $data["reason"]);
-                if ($data["forever"] == false) {
+                if (!$data["forever"]) {
                     $embed->addField("Duration", "".$days."d, ".$hours."h, ".$minutes."m, ".$seconds."s");
                 } else {
                     $embed->addField("Duration", "Forever");
@@ -167,7 +167,7 @@ class MuteForm {
             }
 			return true;
         });
-        $form->setTitle("Muting Menu");
+        $form->setTitle("Muting Form");
         $form->addDropdown("Pick the player you want to mute", $this->plugin->getonlineplayersname(), null, "name");
         $form->addInput("Or type the §lEXACT§r name of the player you want to mute", "Ex.: ".$player->getName(), "", "offlinename");
         $form->addInput("Reason of mute:", "Ex.: Spamming", "", "reason");

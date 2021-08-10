@@ -60,7 +60,7 @@ class BanForm {
             $player->sendMessage("§7[§bStaffMode§7] §aSuccessfully unbanned player ".$target);
 			return true;
         });
-        $form->setTitle("UnBanning Menu");
+        $form->setTitle("UnBanning Form");
         $form->addDropdown("Pick the player you want to unban", $this->plugin->getbannedplayersname(), null, "unbanplayer");
         $form->addInput("Reason:", "Ex.: False Ban", "", "reason");
         $player->sendForm($form);
@@ -93,7 +93,7 @@ class BanForm {
                 return true;
             }
 
-            if($data["days"] == "0" and $data["hours"] == "0" and $data["minutes"] == "0" and $data["seconds"] == "0" and $data["forever"] == false) {
+            if($data["days"] == "0" and $data["hours"] == "0" and $data["minutes"] == "0" and $data["seconds"] == "0" and !$data["forever"]) {
                 $player->sendMessage("§7[§bStaffMode§7] §cYou must specify an amount of time!");
 				return true;
             }
@@ -107,18 +107,20 @@ class BanForm {
                 if (count($this->plugin->getonlineplayersname()) == 0) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 					return true;
-                }
-                if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
+                } elseif(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 					return true;
-                } else {
+                } elseif ($this->plugin->getonlineplayersname()[$data["name"]] == $player->getName()) {
+					$player->sendMessage("§7[§bStaffMode§7] §cCannot ban yourself!");
+					return true;
+				} else {
                     $target = $this->plugin->getonlineplayersname()[$data["name"]];
                 }
             } else {
                 $target = $data["offlinename"];
             }
 
-            if ($data["forever"] == false) {
+            if (!$data["forever"]) {
                 $time = (((int)$data["days"] * 86400) + ((int)$data["hours"] * 3600) + ((int)$data["minutes"] * 60) + ((int)$data["seconds"]));
                 $days = (int)$data["days"];
                 $hours = (int)$data["hours"];
@@ -127,12 +129,19 @@ class BanForm {
                 if (Server::getInstance()->getPlayer($target)) {
                     Server::getInstance()->getPlayer($target)->kick("§cYou have been banned!\n§rBy: ".$player->getName()."\nReason: ".$data["reason"]."\nDuration: ".$days."d, ".$hours."h, ".$minutes."m, ".$seconds."s", false, $target." was Banned.");
                 }
+				if ($data["broadcast"]) {
+					Server::getInstance()->broadcastMessage("§7[§bStaffMode§7] §c".$target."§4 was banned by §c".$player->getName()."§4. Reason: §c".$data["reason"]."§4. Duration: §c".$days."d, ".$hours."h, ".$minutes."m, ".$seconds."s");
+				}
             } else {
                 $time = -1;
                 if (Server::getInstance()->getPlayer($target)) {
                     Server::getInstance()->getPlayer($target)->kick("§cYou have been banned!\n§rBy: ".$player->getName()."\nReason: ".$data["reason"]."\nDuration: Forever", false, $target." was Banned.");
                 }
+				if ($data["broadcast"]) {
+					Server::getInstance()->broadcastMessage("§7[§bStaffMode§7] §c".$target."§4 was banned by §c".$player->getName()."§4. Reason: §c".$data["reason"]."§4. Duration: §cForever");
+				}
             }
+
             if($this->plugin->alias->exists(strtolower($target))){
                 $Address = (string)$this->plugin->alias->get(strtolower($target))["IPAddress"];
                 $DeviceId = (string)$this->plugin->alias->get(strtolower($target))["DeviceId"];
@@ -153,7 +162,7 @@ class BanForm {
             $this->plugin->history->save();
             $player->sendMessage("§7[§bStaffMode§7] §aSuccessfully banned player ".$target);
 
-            if ($this->plugin->config->get("DiscordWebhooks-Bans") == true) {
+            if ($this->plugin->config->get("DiscordWebhooks-Bans")) {
                 $webHook = new Webhook($this->plugin->config->get("DiscordWebhooks-Bans-Link"));
                 $msg = new Message();
                 $msg->setUsername("StaffMode-Bans");
@@ -163,7 +172,7 @@ class BanForm {
                 $embed->setColor(0x00FF00);
                 $embed->addField("Banned by", $player->getName());
                 $embed->addField("Reason", $data["reason"]);
-                if ($data["forever"] == false) {
+                if (!$data["forever"]) {
                     $embed->addField("Duration", "".$days."d, ".$hours."h, ".$minutes."m, ".$seconds."s");
                 } else {
                     $embed->addField("Duration", "Forever");
@@ -173,7 +182,7 @@ class BanForm {
             }
 			return true;
         });
-        $form->setTitle("Banning Menu");
+        $form->setTitle("Banning Form");
         $form->addDropdown("Pick the player you want to ban", $this->plugin->getonlineplayersname(), null, "name");
         $form->addInput("Or type the §lEXACT§r name of the player you want to ban", "Ex.: ".$player->getName(), "", "offlinename");
         $form->addInput("Reason of ban:", "Ex.: Hacking", "", "reason");
@@ -183,6 +192,7 @@ class BanForm {
         $form->addInput("Hours:", "", "0", "hours");
         $form->addInput("Minutes:", "", "0", "minutes");
         $form->addInput("Seconds:", "", "0", "seconds");
+		$form->addToggle("Broadcast?", false, "broadcast");
         $player->sendForm($form);
     }
 
