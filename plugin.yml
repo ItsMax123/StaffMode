@@ -3,6 +3,9 @@ author: ItsMax123
 main: Max\StaffMode\Main
 version: 2.1.1
 api: [3.0.0]
+depend:
+  - EconomyAPI
+mcpe-protocol: 448
 
 commands:
  staffmode:
@@ -29,10 +32,6 @@ permissions:
   staffmode.bypass:
     default: op
     description: Allows usage of staffmode tools against other staff members.
-
-  staffmode.see:
-    default: op
-    description: Allows user to see staff members that have fake left in the player list.
 
   staffmode.*:
     default: op

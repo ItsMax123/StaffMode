@@ -6,7 +6,7 @@
 # StaffMode
 StaffMode is an all-in-one Pocketmine-MP (PMMP) moderation plugin made to simplify the life of staff members.
 
-# Setup Guide
+## Setup Guide
 1. To start using the plugin, download the StaffMode.phar file from [poggit](https://poggit.pmmp.io/p/StaffMode) and put it into your server's plugins folder. (IMPORTANT: If you do not know how to handle virions, do not download from github, the plugin will not work) 
 2. Then, you have to do is set up your staff rank permissions. Look at the **Risk** tab in the following tables to decide which permissions is more suitable for which staff ranks to prevent possible abuse. It is recommended to give permissions with the *High* risk only to trusted staff members.
 3. The `staffmode.command.staffmode` or `staffmode.*` permission is necessary in order for staff to enter staff mode.
@@ -34,15 +34,14 @@ StaffMode is an all-in-one Pocketmine-MP (PMMP) moderation plugin made to simpli
 
 5. After setting up everything, if done correctly staff members will be able to do the /staffmode command and access all their allowed tools. 
 
-# Features
+## Features
 - Features:
   - [x] /staffmode command
   - [x] /report command
+  - [x] /staffchat command
   - [x] Teleportation tool
   - [x] Playerinfo tool
-  - [x] Inventory Spy tool
-  - [x] EnderChest spy
-  - [x] Inventory/EnderChest clear
+  - [x] Inventory/EnderChest Spy & Clearing tool
   - [x] Warn tool
   - [x] Freeze tool
   - [x] Hit to freeze
@@ -52,12 +51,10 @@ StaffMode is an all-in-one Pocketmine-MP (PMMP) moderation plugin made to simpli
   - [x] Kick tool
   - [x] Ban tool
   - [x] Custom ban system (Including: IpBans, DeviceBans)
-  - [x] Exit StaffMode tool
   - [x] Return to original location with the original inventory after exiting staffmode.
   - [x] Silent Join & Leave (Editable in config)
   - [x] Fake Join & Leave when entering/leaving StaffMode (Editable in config)
   - [x] Remove player from server list when fake leaving
-  - [x] Staff Chat
 - Coming soon...
   - [ ] Edit mute & bans
   - [ ] Close reports
@@ -65,6 +62,6 @@ StaffMode is an all-in-one Pocketmine-MP (PMMP) moderation plugin made to simpli
   - [ ] Staff abuse prevention (Prevent staff from doing commands while in staffmode, prevent staff from banning other staff, etc.)
   - [ ] Please suggest anything you want me to add
 
-# Support
-Join the [discord server](https://discord.gg/YJZNhwhyMQ) for quick support, bug reports and feature requests.
-If you do not have discord, create an issue on github. Please keep in mind that it will take longer for me to reply on github. If you are reporting an issue with the plugin, be sure to include as much detail as possible and steps to reproduce the issue.
+## Support
+Join the [discord server](https://discord.gg/YJZNhwhyMQ) for support.
+For bugs or feature requests, create an issue on GitHub. Please follow the GitHub templates as best you can.
