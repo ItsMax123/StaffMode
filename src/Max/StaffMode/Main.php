@@ -17,8 +17,11 @@ use CortexPE\DiscordWebhookAPI\Webhook;
 use Max\StaffMode\ui\{ReportForm, TeleportForm, PlayerInfoForm, InventoryManagerForm, WarnForm, FreezeForm, MuteForm, KickForm, BanForm};
 use muqsit\invmenu\InvMenuHandler;
 
+use function array_search;
+use function in_array;
+
 class Main extends PluginBase{
-    public $contents, $position, $gamemode, $staffmodestatus, $staffchatstatus, $frozenstatus, $banList, $muteList, $history, $reportList, $alias, $config, $ReportForm, $TeleportForm, $PlayerInfoForm, $InventoryManagerForm, $WarnForm, $FreezeForm, $MuteForm, $KickForm, $BanForm, $DefaultConfig;
+    public $contents, $position, $gamemode, $staffmodestatus = [], $staffchatstatus = [], $frozenstatus =[], $banList, $muteList, $history, $reportList, $alias, $config, $ReportForm, $TeleportForm, $PlayerInfoForm, $InventoryManagerForm, $WarnForm, $FreezeForm, $MuteForm, $KickForm, $BanForm, $DefaultConfig;
 
     public function onEnable() {
         if(!InvMenuHandler::isRegistered()){
@@ -124,24 +127,24 @@ class Main extends PluginBase{
     }
 
 	public function togglestaffchat(Player $player) {
-		if(!$this->staffchatstatus[$player->getName()]) {
-			$this->staffchatstatus[$player->getName()] = True;
+		if(!in_array($player->getName(), $this->staffchatstatus)) {
+			$this->staffchatstatus[] = $player->getName();
 			$player->sendMessage("§7[§bStaffMode§7] §aYou are now in staffchat.");
 		} else {
-			$this->staffchatstatus[$player->getName()] = False;
+			unset($this->staffchatstatus[array_search($player->getName(), $this->staffchatstatus)]);
 			$player->sendMessage("§7[§bStaffMode§7] §aYou are no longer in staffchat.");
 		}
 	}
 
     public function enterstaffmode(Player $player) {
-        if(!$this->staffmodestatus[$player->getName()]) {
+		if(!in_array($player->getName(), $this->staffmodestatus)) {
             $this->contents[$player->getName()] = $player->getInventory()->getContents();
             $this->position[$player->getName()] = $player->getPosition();
             $this->gamemode[$player->getName()] = $player->getGamemode();
             $player->getInventory()->clearAll();
             //$player->teleport(Server::getInstance()->getDefaultLevel()->getSafeSpawn());
             $player->setGamemode(Player::SPECTATOR);
-            $this->staffmodestatus[$player->getName()] = True;
+            $this->staffmodestatus[] = $player->getName();
             $player->sendPopup("§aYou are now in staffmode.");
 
             //Fake Leave message
@@ -218,19 +221,21 @@ class Main extends PluginBase{
         }
     }
 
-    public function exitstaffmode(Player $player, string $playername) {
-    	$player->getInventory()->setContents($this->contents[$playername]);
-    	$player->teleport($this->position[$playername]);
-    	$player->setGamemode($this->gamemode[$playername]);
-    	$this->staffmodestatus[$playername] = False;
-    	Server::getInstance()->addOnlinePlayer($player);
-    	$player->sendPopup("§cYou are no longer in staffmode.");
+    public function exitstaffmode(Player $player) {
+		if(in_array($player->getName(), $this->staffmodestatus)) {
+			$player->getInventory()->setContents($this->contents[$player->getName()]);
+			$player->teleport($this->position[$player->getName()]);
+			$player->setGamemode($this->gamemode[$player->getName()]);
+			unset($this->staffmodestatus[array_search($player->getName(), $this->staffmodestatus)]);
+			Server::getInstance()->addOnlinePlayer($player);
+			$player->sendPopup("§cYou are no longer in staffmode.");
 
-    	//Fake join message
-		if($this->config->get("FakeJoin")){
-			$message = $this->getConfig()->get("FakeJoin-Message");
-			$message = str_replace("<player>", "$playername", $message);
-			$this->getServer()->broadcastMessage($message);
+			//Fake join message
+			if ($this->config->get("FakeJoin")) {
+				$message = $this->getConfig()->get("FakeJoin-Message");
+				$message = str_replace("<player>", "$player->getName()", $message);
+				$this->getServer()->broadcastMessage($message);
+			}
 		}
     }
 
