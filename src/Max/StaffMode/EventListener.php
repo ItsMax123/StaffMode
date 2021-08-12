@@ -159,7 +159,7 @@ class EventListener implements Listener {
     //Silent leave & leave staff mode
 	/**
 	 * @param PlayerQuitEvent $event
-	 * @priority HIGHEST
+	 * @priority LOWEST
 	 */
 
     public function onQuit(PlayerQuitEvent $event){
@@ -175,7 +175,7 @@ class EventListener implements Listener {
     //Leave staff mode
 	/**
 	 * @param PlayerKickEvent $event
-	 * @priority HIGHEST
+	 * @priority LOWEST
 	 */
 
     public function onKick(PlayerKickEvent $event){
