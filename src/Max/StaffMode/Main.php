@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Max\StaffMode;
 
 use pocketmine\{Player, Server};
+use pocketmine\entity\Effect;
 use pocketmine\item\Item;
 use pocketmine\utils\{Config};
 use pocketmine\plugin\PluginBase;
@@ -27,6 +28,8 @@ class Main extends PluginBase{
         if(!InvMenuHandler::isRegistered()){
             InvMenuHandler::register($this);
         }
+
+		$this->getScheduler()->scheduleRepeatingTask(new StaffModeTask($this), 20);
 
         new EventListener($this);
         $this->ReportForm = new ReportForm($this);
@@ -105,11 +108,21 @@ class Main extends PluginBase{
 		}
     }
 
+	public function onDisable() {
+		foreach(Server::getInstance()->getOnlinePlayers() as $player){
+			$this->exitstaffmode($player);
+		}
+	}
+
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args) : bool{
         if ($sender instanceof Player) {
             switch($command->getName()){
                 case "staffmode":
-                    $this->enterstaffmode($sender);
+					if(!in_array($sender->getName(), $this->staffmodestatus)) {
+                    	$this->enterstaffmode($sender);
+					} elseif (in_array($sender->getName(), $this->staffmodestatus)){
+						$this->exitstaffmode($sender);
+					}
                     return true;
 				case "staffchat":
 					$this->togglestaffchat($sender);
@@ -145,7 +158,7 @@ class Main extends PluginBase{
             //$player->teleport(Server::getInstance()->getDefaultLevel()->getSafeSpawn());
             $player->setGamemode(Player::SPECTATOR);
             $this->staffmodestatus[] = $player->getName();
-            $player->sendPopup("§aYou are now in staffmode.");
+			$player->sendTip("§k§c!§3!§c!§r §aYou are in staffmode §k§c!§3!§c!");
 
             //Fake Leave message
             if($this->config->get("FakeLeave")){
@@ -157,67 +170,85 @@ class Main extends PluginBase{
             }
     
             //COMPASS | TELEPORT TO PLAYER
-            $compass = Item::get(Item::COMPASS, 0, 1);
-            $compass->setCustomName("§aTeleport to player");
-            $compass->setNamedTagEntry(new StringTag("staffmode", "true"));
-            $compass->setLore(["§rRight click to open teleportation menu.\nHit a player to see their username."]);
-            $player->getInventory()->setItem(0, $compass);
+			if ($player->hasPermission("staffmode.tools.teleport")) {
+				$compass = Item::get(Item::COMPASS, 0, 1);
+				$compass->setCustomName("§aTeleport to player");
+				$compass->setNamedTagEntry(new StringTag("staffmode", "true"));
+				$compass->setLore(["§rRight click to open teleportation menu.\nHit a player to see their username."]);
+				$player->getInventory()->setItem(0, $compass);
+			}
     
             //BOOK | SEE PLAYER HISTORY
-            $book = Item::get(Item::BOOK, 0, 1);
-            $book->setCustomName("§aPlayer Info");
-            $book->setNamedTagEntry(new StringTag("staffmode", "true"));
-            $book->setLore(["§rRight click to open player info menu."]);
-            $player->getInventory()->setItem(1, $book);
+			if ($player->hasPermission("staffmode.tools.playerinfo")) {
+				$book = Item::get(Item::BOOK, 0, 1);
+				$book->setCustomName("§aPlayer Info");
+				$book->setNamedTagEntry(new StringTag("staffmode", "true"));
+				$book->setLore(["§rRight click to open player info menu."]);
+				$player->getInventory()->setItem(1, $book);
+			}
 
 			//CHEST | INVENTORY MANAGER
-			$chest = Item::get(Item::CHEST, 0, 1);
-			$chest->setCustomName("§aInventory Manager");
-			$chest->setNamedTagEntry(new StringTag("staffmode", "true"));
-			$chest->setLore(["§rRight click to open inventory manager menu."]);
-			$player->getInventory()->setItem(2, $chest);
+			if ($player->hasPermission("staffmode.tools.inventorymanager")) {
+				$chest = Item::get(Item::CHEST, 0, 1);
+				$chest->setCustomName("§aInventory Manager");
+				$chest->setNamedTagEntry(new StringTag("staffmode", "true"));
+				$chest->setLore(["§rRight click to open inventory manager menu."]);
+				$player->getInventory()->setItem(2, $chest);
+			}
     
             //PAPER | WARN THE PLAYER
-            $paper = Item::get(Item::PAPER, 0, 1);
-			$paper->setCustomName("§dWarn a player");
-			$paper->setNamedTagEntry(new StringTag("staffmode", "true"));
-			$paper->setLore(["§rRight click to open warning menu."]);
-            $player->getInventory()->setItem(3, $paper);
+			if ($player->hasPermission("staffmode.tools.warn")) {
+				$paper = Item::get(Item::PAPER, 0, 1);
+				$paper->setCustomName("§dWarn a player");
+				$paper->setNamedTagEntry(new StringTag("staffmode", "true"));
+				$paper->setLore(["§rRight click to open warning menu."]);
+				$player->getInventory()->setItem(3, $paper);
+			}
     
             //ICE BLOCK | FREEZE THE PLAYER
-            $ice = Item::get(Item::PACKED_ICE, 0, 1);
-            $ice->setCustomName("§bFreeze a player");
-            $ice->setNamedTagEntry(new StringTag("staffmode", "true"));
-            $ice->setLore(["§rRight click to open freezing menu.\nHit a player to freeze them."]);
-            $player->getInventory()->setItem(4, $ice);
+			if ($player->hasPermission("staffmode.tools.freeze")) {
+				$ice = Item::get(Item::PACKED_ICE, 0, 1);
+				$ice->setCustomName("§bFreeze a player");
+				$ice->setNamedTagEntry(new StringTag("staffmode", "true"));
+				$ice->setLore(["§rRight click to open freezing menu.\nHit a player to freeze them."]);
+				$player->getInventory()->setItem(4, $ice);
+			}
                 
             //GOLD HOE | MUTE THE PLAYER
-            $ghoe = Item::get(Item::GOLDEN_HOE, 0, 1);
-            $ghoe->setCustomName("§6Mute a player");
-            $ghoe->setNamedTagEntry(new StringTag("staffmode", "true"));
-            $ghoe->setLore(["§rRight click to open muting menu."]);
-            $player->getInventory()->setItem(5, $ghoe);
+			if ($player->hasPermission("staffmode.tools.mute")) {
+				$ghoe = Item::get(Item::GOLDEN_HOE, 0, 1);
+				$ghoe->setCustomName("§6Mute a player");
+				$ghoe->setNamedTagEntry(new StringTag("staffmode", "true"));
+				$ghoe->setLore(["§rRight click to open muting menu."]);
+				$player->getInventory()->setItem(5, $ghoe);
+			}
     
             //GOLD SWORD | KICK THE PLAYER
-            $gsword = Item::get(Item::GOLDEN_SWORD, 0, 1);
-            $gsword->setCustomName("§cKick a player");
-            $gsword->setNamedTagEntry(new StringTag("staffmode", "true"));
-            $gsword->setLore(["§rRight click to open kicking menu."]);
-            $player->getInventory()->setItem(6, $gsword);
+			if ($player->hasPermission("staffmode.tools.kick")) {
+				$gsword = Item::get(Item::GOLDEN_SWORD, 0, 1);
+				$gsword->setCustomName("§cKick a player");
+				$gsword->setNamedTagEntry(new StringTag("staffmode", "true"));
+				$gsword->setLore(["§rRight click to open kicking menu."]);
+				$player->getInventory()->setItem(6, $gsword);
+			}
     
             //GOLD AXE | BAN THE PLAYER
-            $gaxe = Item::get(Item::GOLDEN_AXE, 0, 1);
-            $gaxe->setCustomName("§4Ban a player");
-            $gaxe->setNamedTagEntry(new StringTag("staffmode", "true"));
-            $gaxe->setLore(["§rRight click to open banning menu."]);
-            $player->getInventory()->setItem(7, $gaxe);
+			if ($player->hasPermission("staffmode.tools.ban")) {
+				$gaxe = Item::get(Item::GOLDEN_AXE, 0, 1);
+				$gaxe->setCustomName("§4Ban a player");
+				$gaxe->setNamedTagEntry(new StringTag("staffmode", "true"));
+				$gaxe->setLore(["§rRight click to open banning menu."]);
+				$player->getInventory()->setItem(7, $gaxe);
+			}
     
             //REDSTONE_TORCH | EXIT STAFF MODE
-            $rtorch = Item::get(Item::LIT_REDSTONE_TORCH, 0, 1);
-            $rtorch->setCustomName("§cExit StaffMode");
-            $rtorch->setNamedTagEntry(new StringTag("staffmode", "true"));
-            $rtorch->setLore(["§rRight click to exit StaffMode."]);
-            $player->getInventory()->setItem(8, $rtorch);
+			if ($player->hasPermission("staffmode.tools.exit")) {
+				$rtorch = Item::get(Item::LIT_REDSTONE_TORCH, 0, 1);
+				$rtorch->setCustomName("§cExit StaffMode");
+				$rtorch->setNamedTagEntry(new StringTag("staffmode", "true"));
+				$rtorch->setLore(["§rRight click to exit StaffMode."]);
+				$player->getInventory()->setItem(8, $rtorch);
+			}
         }
     }
 
@@ -228,7 +259,8 @@ class Main extends PluginBase{
 			$player->setGamemode($this->gamemode[$player->getName()]);
 			unset($this->staffmodestatus[array_search($player->getName(), $this->staffmodestatus)]);
 			Server::getInstance()->addOnlinePlayer($player);
-			$player->sendPopup("§cYou are no longer in staffmode.");
+			$player->removeEffect(Effect::NIGHT_VISION);
+			$player->sendTip("§cYou are no longer in staffmode.");
 
 			//Fake join message
 			if ($this->config->get("FakeJoin")) {

@@ -157,6 +157,10 @@ class EventListener implements Listener {
     }
 
     //Silent leave & leave staff mode
+	/**
+	 * @param PlayerQuitEvent $event
+	 * @priority HIGHEST
+	 */
 
     public function onQuit(PlayerQuitEvent $event){
         $player = $event->getPlayer();
@@ -169,10 +173,13 @@ class EventListener implements Listener {
     }
 
     //Leave staff mode
+	/**
+	 * @param PlayerKickEvent $event
+	 * @priority HIGHEST
+	 */
 
     public function onKick(PlayerKickEvent $event){
-        $player = $event->getPlayer();
-        $this->plugin->exitstaffmode($player);
+        $this->plugin->exitstaffmode($event->getPlayer());
     }
 
     //Prevent block break when frozen

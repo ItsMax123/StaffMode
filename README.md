@@ -55,6 +55,7 @@ StaffMode is an all-in-one Pocketmine-MP (PMMP) moderation plugin made to simpli
   - [x] Silent Join & Leave (Editable in config)
   - [x] Fake Join & Leave when entering/leaving StaffMode (Editable in config)
   - [x] Remove player from server list when fake leaving
+  - [x] Night vision when in staffmode
 - Coming soon...
   - [ ] Edit mute & bans
   - [ ] Close reports
