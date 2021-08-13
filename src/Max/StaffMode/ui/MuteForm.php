@@ -29,9 +29,15 @@ class MuteForm {
 			return true;
         });
         $form->setTitle("Muting Menu");
-        $form->addButton("Mute", -1, "", "mute");
-        $form->addButton("UnMute", -1, "", "unmute");
-        $form->addButton("See full mute list", -1, "", "list");
+		if ($player->hasPermission("staffmode.tools.mute.mute")) {
+			$form->addButton("Mute", -1, "", "mute");
+		}
+		if ($player->hasPermission("staffmode.tools.mute.unmute")) {
+			$form->addButton("UnMute", -1, "", "unmute");
+		}
+		if ($player->hasPermission("staffmode.tools.mute.mutelist")) {
+			$form->addButton("See full mute list", -1, "", "list");
+		}
         $player->sendForm($form);
     }
 
@@ -139,10 +145,10 @@ class MuteForm {
             $this->plugin->muteList->save();
             if($this->plugin->history->exists(strtolower($target))){
                 $history = $this->plugin->history->get(strtolower($target));
-                array_unshift($history, ["type" => "muted", "reason" => $data["reason"], "staff" => $player->getName(), "time" => time(), "unbantime" => (time() + $time)]);
+                array_unshift($history, ["type" => "muted", "reason" => $data["reason"], "staff" => $player->getName(), "time" => time(), "unmutetime" => (time() + $time)]);
                 $this->plugin->history->set(strtolower($target), $history);
             } else {
-                $this->plugin->history->set(strtolower($target), ([["type" => "muted", "reason" => $data["reason"], "staff" => $player->getName(), "time" => time(), "unbantime" => (time() + $time)]]));
+                $this->plugin->history->set(strtolower($target), ([["type" => "muted", "reason" => $data["reason"], "staff" => $player->getName(), "time" => time(), "unmutetime" => (time() + $time)]]));
             }
             $this->plugin->history->save();
             $player->sendMessage("§7[§bStaffMode§7] §aSuccessfully muted player ".$target);

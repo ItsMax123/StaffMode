@@ -29,9 +29,15 @@ class BanForm {
 			return true;
         });
         $form->setTitle("Banning Menu");
-        $form->addButton("Ban", -1, "", "ban");
-        $form->addButton("UnBan", -1, "", "unban");
-        $form->addButton("See full ban list", -1, "", "list");
+		if ($player->hasPermission("staffmode.tools.ban.ban")) {
+			$form->addButton("Ban", -1, "", "ban");
+		}
+		if ($player->hasPermission("staffmode.tools.ban.unban")) {
+			$form->addButton("UnBan", -1, "", "unban");
+		}
+		if ($player->hasPermission("staffmode.tools.ban.banlist")) {
+			$form->addButton("See full ban list", -1, "", "list");
+		}
         $player->sendForm($form);
     }
 
@@ -119,6 +125,13 @@ class BanForm {
             } else {
                 $target = $data["offlinename"];
             }
+
+            if (!$player->hasPermission("staffmode.bypass")) {
+            	if ($target->hasPermission("staffmode.command.staffmode")) {
+					$player->sendMessage("§7[§bStaffMode§7] §cCannot ban a staff member!");
+					return true;
+				}
+			}
 
             if (!$data["forever"]) {
                 $time = (((int)$data["days"] * 86400) + ((int)$data["hours"] * 3600) + ((int)$data["minutes"] * 60) + ((int)$data["seconds"]));

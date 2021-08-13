@@ -15,7 +15,7 @@ commands:
     description: Puts you in staff chat.
     usage: "/staffchat"
     aliases: [ "sc" ]
-    permission: staffmode.staffchat
+    permission: staffmode.command.staffchat
  report:
   description: Opens the report Interface.
   usage: "/report"
@@ -27,26 +27,30 @@ permissions:
     default: true
     description: Allows usage of the "/report" command.
 
-  staffmode.bypass:
-    default: op
-    description: Allows usage of staffmode tools against other staff members.
+  #staffmode.bypass:
+  #  default: op
+  #  description: Allows usage of staffmode tools against other staff members.
 
   staffmode.*:
     default: op
     description: Allows usage of all staffmode features.
     children:
 
+      staffmode.silent:
+        default: op
+        description: Allows user to join and leave the server with no broadcasted message.
+
+      staffmode.alerts:
+        default: op
+        description: Allows staff to receive alert when reported/BOLOED player joins the server.
+
       staffmode.command.staffmode:
         default: op
         description: Allows usage of the "/staffmode" command.
 
-      staffmode.staffchat:
+      staffmode.command.staffchat:
         default: op
         description: Allows usage of the "/staffchat" command.
-
-      staffmode.silent:
-        default: op
-        description: Allows user to join and leave the server with no broadcasted message.
 
       staffmode.tools.teleport:
         default: op
@@ -56,12 +60,24 @@ permissions:
         default: op
         description: Allows usage of the PlayerInfo tool (book) in staffmode.
         children:
+          staffmode.tools.playerinfo.bolo:
+            default: op
+            description: Allows seeing the BOLO list (sub-tool of PlayerInfo tool) in staffmode.
+            children:
+              staffmode.tools.playerinfo.bolo.add:
+                default: op
+                description: Allows adding users to the BOLO list (sub-tool of PlayerInfo tool) in staffmode.
+                children:
           staffmode.tools.playerinfo.history:
             default: op
             description: Allows usage of the History (sub-tool of PlayerInfo tool) in staffmode.
           staffmode.tools.playerinfo.reports:
             default: op
             description: Allows usage of the Reports (sub-tool of PlayerInfo tool) in staffmode.
+            children:
+              staffmode.tools.playerinfo.reports.close:
+                default: op
+                description: Allows closing Reports (sub-tool of PlayerInfo tool) in staffmode.
 
       staffmode.tools.inventorymanager:
         default: op

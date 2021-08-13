@@ -22,7 +22,7 @@ use function array_search;
 use function in_array;
 
 class Main extends PluginBase{
-    public $contents, $position, $gamemode, $staffmodestatus = [], $staffchatstatus = [], $frozenstatus =[], $banList, $muteList, $history, $reportList, $alias, $config, $ReportForm, $TeleportForm, $PlayerInfoForm, $InventoryManagerForm, $WarnForm, $FreezeForm, $MuteForm, $KickForm, $BanForm, $DefaultConfig;
+    public $contents, $position, $gamemode, $staffmodestatus = [], $staffchatstatus = [], $frozenstatus =[], $banList, $muteList, $history, $reportList, $boloList, $alias, $config, $ReportForm, $TeleportForm, $PlayerInfoForm, $InventoryManagerForm, $WarnForm, $FreezeForm, $MuteForm, $KickForm, $BanForm, $DefaultConfig;
 
     public function onEnable() {
         if(!InvMenuHandler::isRegistered()){
@@ -60,9 +60,10 @@ class Main extends PluginBase{
 		}
         $this->banList = new Config($this->getDataFolder()."BanList.yml", Config::YAML);
         $this->muteList = new Config($this->getDataFolder()."MuteList.yml", Config::YAML);
-        $this->history = new Config($this->getDataFolder()."History.yml", Config::YAML);
         $this->reportList = new Config($this->getDataFolder()."ReportList.yml", Config::YAML);
+		$this->boloList = new Config($this->getDataFolder()."boloList.yml", Config::YAML);
         $this->alias = new Config($this->getDataFolder()."Alias.yml", Config::YAML);
+		$this->history = new Config($this->getDataFolder()."History.yml", Config::YAML);
         $this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
 
 		$this->DefaultConfig = array(
@@ -75,6 +76,8 @@ class Main extends PluginBase{
 			"FakeJoin-Message" => "§e<player> joined the game",
 			"SilentJoin" => true,
 			"SilentLeave" => false,
+			"DiscordWebhooks-Bolos" => false,
+			"DiscordWebhooks-Bolos-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
 			"DiscordWebhooks-Reports" => false,
 			"DiscordWebhooks-Reports-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
 			"DiscordWebhooks-Warnings" => false,
@@ -168,7 +171,7 @@ class Main extends PluginBase{
                 $message = str_replace("<player>", "$name", $message);
                 $this->getServer()->broadcastMessage($message);
             }
-    
+
             //COMPASS | TELEPORT TO PLAYER
 			if ($player->hasPermission("staffmode.tools.teleport")) {
 				$compass = Item::get(Item::COMPASS, 0, 1);
@@ -225,11 +228,11 @@ class Main extends PluginBase{
     
             //GOLD SWORD | KICK THE PLAYER
 			if ($player->hasPermission("staffmode.tools.kick")) {
-				$gsword = Item::get(Item::GOLDEN_SWORD, 0, 1);
-				$gsword->setCustomName("§cKick a player");
-				$gsword->setNamedTagEntry(new StringTag("staffmode", "true"));
-				$gsword->setLore(["§rRight click to open kicking menu."]);
-				$player->getInventory()->setItem(6, $gsword);
+				$gboots = Item::get(Item::GOLDEN_BOOTS, 0, 1);
+				$gboots->setCustomName("§cKick a player");
+				$gboots->setNamedTagEntry(new StringTag("staffmode", "true"));
+				$gboots->setLore(["§rRight click to open kicking menu."]);
+				$player->getInventory()->setItem(6, $gboots);
 			}
     
             //GOLD AXE | BAN THE PLAYER

@@ -101,9 +101,8 @@ class EventListener implements Listener {
         }
     }
 
-    //Silent Join
+    //Silent Join & Warning reports
     /**
-     * @param PlayerJoinEvent $event
      * @priority HIGHEST
      */
 
@@ -117,6 +116,38 @@ class EventListener implements Listener {
 		foreach(Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
 			if(in_array($onlinePlayer->getName(), $this->plugin->staffmodestatus)) {
 				Server::getInstance()->removePlayerListData($onlinePlayer->getUniqueId());
+			}
+		}
+		foreach($this->plugin->reportList->get("reports") as $reportList) {
+			if ($player->getName() == (string)$reportList["target"]) {
+				foreach(Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
+					if ($onlinePlayer->hasPermission("staffmode.alerts")) {
+						$onlinePlayer->sendMessage("§7[§bStaffMode§7] §c".$player->getName()." §4was previously reported for: §6".$reportList["reason"]);
+					}
+				}
+			}
+		}
+		foreach($this->plugin->boloList->get("bolos") as $boloList) {
+			if ($player->getName() == (string)$boloList["target"]) {
+				foreach(Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
+					if ($onlinePlayer->hasPermission("staffmode.alerts")) {
+						$onlinePlayer->sendMessage("§7[§bStaffMode§7] §c".$player->getName()." §4is on the BOLO list for: §6".$boloList["reason"]);
+					}
+				}
+			}
+		}
+		if ($player->hasPermission("staffmode.alerts")) {
+			foreach(Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
+				foreach($this->plugin->reportList->get("reports") as $reportList) {
+					if ($onlinePlayer->getName() == (string)$reportList["target"]) {
+						$player->sendMessage("§7[§bStaffMode§7] §c".$onlinePlayer->getName()." §4was previously reported for: §6".$reportList["reason"]);
+					}
+				}
+				foreach($this->plugin->boloList->get("bolos") as $boloList) {
+					if ($onlinePlayer->getName() == (string)$boloList["target"]) {
+						$player->sendMessage("§7[§bStaffMode§7] §c".$onlinePlayer->getName()." §4is on the BOLO list for: §6".$boloList["reason"]);
+					}
+				}
 			}
 		}
     }
@@ -136,7 +167,6 @@ class EventListener implements Listener {
 
     //Prevent people from changing world in staff mode (to prevent original inventory loss and other bugs) if there is a perworldinventory plugin
     /**
-     * @param EntityLevelChangeEvent $event
      * @priority HIGHEST
      * @ignoreCancelled true
      */
@@ -158,7 +188,6 @@ class EventListener implements Listener {
 
     //Silent leave & leave staff mode
 	/**
-	 * @param PlayerQuitEvent $event
 	 * @priority LOWEST
 	 */
 
@@ -174,7 +203,6 @@ class EventListener implements Listener {
 
     //Leave staff mode
 	/**
-	 * @param PlayerKickEvent $event
 	 * @priority LOWEST
 	 */
 
@@ -222,7 +250,7 @@ class EventListener implements Listener {
         $player = $event->getPlayer();
         $message = $event->getMessage();
 		if(in_array($player->getName(), $this->plugin->frozenstatus)) {
-            if(($message !== "/staffmode")and(substr($message, 0, 1) == "/")){
+            if(($message !== "/staffmode")and($message !== "/sm")and(substr($message, 0, 1) == "/")){
                 $event->setCancelled();
                 $player->sendMessage("§7[§bStaffMode§7] §cCannot do that while frozen!");
             }
@@ -252,13 +280,16 @@ class EventListener implements Listener {
     }
 
     //StaffChat
+	/**
+	 * @priority HIGHEST
+	 */
 
 	public function onChat(PlayerChatEvent $event) {
 		$player = $event->getPlayer();
 		if(in_array($player->getName(), $this->plugin->staffchatstatus)) {
 			$recipients = [];
 			foreach (Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
-				if ($onlinePlayer->hasPermission("staffmode.staffchat")) {
+				if ($onlinePlayer->hasPermission("staffmode.command.staffchat")) {
 					array_push($recipients, $onlinePlayer);
 				}
 			}
@@ -364,7 +395,7 @@ class EventListener implements Listener {
                     } else {
                         $player->sendMessage("§7[§bStaffMode§7] §cYou do not have permission to use this tool.");
                     }
-                } elseif($item->getId() == Item::GOLDEN_SWORD) {
+                } elseif($item->getId() == Item::GOLDEN_BOOTS) {
                     if ($player->hasPermission("staffmode.tools.kick")) {
                         $this->plugin->KickForm->KickingForm($player);
                     } else {

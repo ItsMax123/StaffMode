@@ -36,14 +36,21 @@ class InventoryManagerForm {
 			return true;
 		});
 		$form->setTitle("Inventory Manager Menu");
-
-		$form->addButton("Inventory Spy", -1, "", "invsee");
-		$form->addButton("EnderChest Spy", -1, "", "enderchestsee");
-		if($this->plugin->config->get("Allow-Inventory-Clear")) {
-			$form->addButton("Inventory Clear", -1, "", "invclear");
+		if ($player->hasPermission("staffmode.tools.inventorymanager.invspy")) {
+			$form->addButton("Inventory Spy", -1, "", "invsee");
 		}
-		if($this->plugin->config->get("Allow-EnderChest-Clear")) {
-			$form->addButton("EnderChest Clear", -1, "", "enderchestclear");
+		if ($player->hasPermission("staffmode.tools.inventorymanager.enderchestspy")) {
+			$form->addButton("EnderChest Spy", -1, "", "enderchestsee");
+		}
+		if ($player->hasPermission("staffmode.tools.inventorymanager.invclear")) {
+			if ($this->plugin->config->get("Allow-Inventory-Clear")) {
+				$form->addButton("Inventory Clear", -1, "", "invclear");
+			}
+		}
+		if ($player->hasPermission("staffmode.tools.inventorymanager.enderchestclear")) {
+			if ($this->plugin->config->get("Allow-EnderChest-Clear")) {
+				$form->addButton("EnderChest Clear", -1, "", "enderchestclear");
+			}
 		}
 
 		$player->sendForm($form);
