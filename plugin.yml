@@ -4,6 +4,8 @@ main: Max\StaffMode\Main
 version: 2.1.1
 api: [3.0.0]
 mcpe-protocol: 448
+softdepend: PerWorldPlayer
+#load: POSTWORLD
 
 commands:
  staffmode:
@@ -27,9 +29,9 @@ permissions:
     default: true
     description: Allows usage of the "/report" command.
 
-  #staffmode.bypass:
-  #  default: op
-  #  description: Allows usage of staffmode tools against other staff members.
+  staffmode.bypass:
+    default: op
+    description: Allows usage of staffmode tools against other staff members.
 
   staffmode.*:
     default: op

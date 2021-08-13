@@ -15,6 +15,10 @@ use pocketmine\event\entity\{EntityDamageEvent, EntityDamageByEntityEvent, Entit
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\server\{DataPacketReceiveEvent, QueryRegenerateEvent};
 use pocketmine\Server;
+use pocketmine\event\server\CommandEvent;
+use pocketmine\event\plugin\PluginDisableEvent;
+use BlockHorizons\PerWorldPlayer\events\PerWorldPlayerDataSaveEvent;
+use BlockHorizons\PerWorldPlayer\world\data\PlayerWorldData;
 
 use function in_array;
 
@@ -24,6 +28,18 @@ class EventListener implements Listener {
         $this->plugin = $pl;
         $pl->getServer()->getPluginManager()->registerEvents($this, $pl);
     }
+
+	/**
+	 * @priority LOWEST
+	 */
+
+	public function onPerWorldPlayerDataSave(PerWorldPlayerDataSaveEvent $event) {
+		foreach(Server::getInstance()->getOnlinePlayers() as $player){
+			var_dump("yay");
+			$this->plugin->exitstaffmode($player);
+			$event->setPlayerWorldData(PlayerWorldData::fromPlayer($player));
+		}
+	}
 
     //If player is NOT banned, save all their alias info when they join.
     /**
