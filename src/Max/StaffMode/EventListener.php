@@ -15,8 +15,6 @@ use pocketmine\event\entity\{EntityDamageEvent, EntityDamageByEntityEvent, Entit
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
 use pocketmine\event\server\{DataPacketReceiveEvent, QueryRegenerateEvent};
 use pocketmine\Server;
-use pocketmine\event\server\CommandEvent;
-use pocketmine\event\plugin\PluginDisableEvent;
 use BlockHorizons\PerWorldPlayer\events\PerWorldPlayerDataSaveEvent;
 use BlockHorizons\PerWorldPlayer\world\data\PlayerWorldData;
 
