@@ -132,34 +132,42 @@ class EventListener implements Listener {
 				Server::getInstance()->removePlayerListData($onlinePlayer->getUniqueId());
 			}
 		}
-		foreach($this->plugin->reportList->get("reports") as $reportList) {
-			if ($player->getName() == (string)$reportList["target"]) {
-				foreach(Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
-					if ($onlinePlayer->hasPermission("staffmode.alerts")) {
-						$onlinePlayer->sendMessage("§7[§bStaffMode§7] §c".$player->getName()." §4was previously reported for: §6".$reportList["reason"]);
+		if (!is_null($this->plugin->reportList->get("reports"))) {
+			foreach ($this->plugin->reportList->get("reports") as $reportList) {
+				if ($player->getName() == (string)$reportList["target"]) {
+					foreach (Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
+						if ($onlinePlayer->hasPermission("staffmode.alerts")) {
+							$onlinePlayer->sendMessage("§7[§bStaffMode§7] §c" . $player->getName() . " §4was previously reported for: §6" . $reportList["reason"]);
+						}
 					}
 				}
 			}
 		}
-		foreach($this->plugin->boloList->get("bolos") as $boloList) {
-			if ($player->getName() == (string)$boloList["target"]) {
-				foreach(Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
-					if ($onlinePlayer->hasPermission("staffmode.alerts")) {
-						$onlinePlayer->sendMessage("§7[§bStaffMode§7] §c".$player->getName()." §4is on the BOLO list for: §6".$boloList["reason"]);
+		if (!is_null($this->plugin->boloList->get("bolos"))) {
+			foreach ($this->plugin->boloList->get("bolos") as $boloList) {
+				if ($player->getName() == (string)$boloList["target"]) {
+					foreach (Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
+						if ($onlinePlayer->hasPermission("staffmode.alerts")) {
+							$onlinePlayer->sendMessage("§7[§bStaffMode§7] §c" . $player->getName() . " §4is on the BOLO list for: §6" . $boloList["reason"]);
+						}
 					}
 				}
 			}
 		}
 		if ($player->hasPermission("staffmode.alerts")) {
 			foreach(Server::getInstance()->getOnlinePlayers() as $onlinePlayer) {
-				foreach($this->plugin->reportList->get("reports") as $reportList) {
-					if ($onlinePlayer->getName() == (string)$reportList["target"]) {
-						$player->sendMessage("§7[§bStaffMode§7] §c".$onlinePlayer->getName()." §4was previously reported for: §6".$reportList["reason"]);
+				if (!is_null($this->plugin->reportList->get("reports"))) {
+					foreach ($this->plugin->reportList->get("reports") as $reportList) {
+						if ($onlinePlayer->getName() == (string)$reportList["target"]) {
+							$player->sendMessage("§7[§bStaffMode§7] §c" . $onlinePlayer->getName() . " §4was previously reported for: §6" . $reportList["reason"]);
+						}
 					}
 				}
-				foreach($this->plugin->boloList->get("bolos") as $boloList) {
-					if ($onlinePlayer->getName() == (string)$boloList["target"]) {
-						$player->sendMessage("§7[§bStaffMode§7] §c".$onlinePlayer->getName()." §4is on the BOLO list for: §6".$boloList["reason"]);
+				if (!is_null($this->plugin->boloList->get("bolos"))) {
+					foreach ($this->plugin->boloList->get("bolos") as $boloList) {
+						if ($onlinePlayer->getName() == (string)$boloList["target"]) {
+							$player->sendMessage("§7[§bStaffMode§7] §c" . $onlinePlayer->getName() . " §4is on the BOLO list for: §6" . $boloList["reason"]);
+						}
 					}
 				}
 			}
