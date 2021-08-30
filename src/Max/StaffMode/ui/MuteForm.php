@@ -96,7 +96,7 @@ class MuteForm {
     }
 
     public function MutingFormPartTwo(Player $player) : void {
-        $form = new CustomForm(function (Player $player, $data) {
+        $form = new CustomForm(function (Player $player, $data, $playernamelist) {
             if($data === null) {
                 return true;
             }
@@ -112,15 +112,15 @@ class MuteForm {
             }
 
             if ($data["offlinename"] == "") {
-                if (count($this->plugin->getonlineplayersname()) == 0) {
+                if (count($playernamelist) == 0) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 					return true;
                 }
-                if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
+                if(Server::getInstance()->getPlayer($playernamelist[$data["name"]]) === null) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 					return true;
                 } else {
-                    $target = $this->plugin->getonlineplayersname()[$data["name"]];
+                    $target = $playernamelist[$data["name"]];
                 }
             } else {
                 $target = $data["offlinename"];
@@ -173,8 +173,9 @@ class MuteForm {
             }
 			return true;
         });
+		$playernamelist = $this->plugin->getonlineplayersname();
         $form->setTitle("Muting Form");
-        $form->addDropdown("Pick the player you want to mute", $this->plugin->getonlineplayersname(), null, "name");
+        $form->addDropdown("Pick the player you want to mute", $playernamelist, null, "name");
         $form->addInput("Or type the §lEXACT§r name of the player you want to mute", "Ex.: ".$player->getName(), "", "offlinename");
         $form->addInput("Reason of mute:", "Ex.: Spamming", "", "reason");
         $form->addLabel("Duration of mute:");

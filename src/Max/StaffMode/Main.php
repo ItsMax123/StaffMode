@@ -70,6 +70,7 @@ class Main extends PluginBase{
 			"Allow-World-Change" => true,
 			"Allow-Inventory-Clear" => true,
 			"Allow-EnderChest-Clear" => true,
+			"Allow-Armor-Clear" => true,
 			"FakeLeave" => true,
 			"FakeLeave-Message" => "§e<player> left the game",
 			"FakeJoin" => false,
@@ -86,6 +87,8 @@ class Main extends PluginBase{
 			"DiscordWebhooks-Inventory-Clears-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
 			"DiscordWebhooks-EnderChest-Clears" => false,
 			"DiscordWebhooks-EnderChest-Clears-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
+			"DiscordWebhooks-Armor-Clears" => false,
+			"DiscordWebhooks-Armor-Clears-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
 			"DiscordWebhooks-Mutes" => false,
 			"DiscordWebhooks-Mutes-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
 			"DiscordWebhooks-Kicks" => false,
@@ -106,6 +109,7 @@ class Main extends PluginBase{
 		}
 
 		if ($this->getServer()->getPluginManager()->getPlugin("PerWorldPlayer")) {
+			new PerWorldPlayerEvents($this);
 			$this->config->set("Allow-World-Change", false);
 			$this->config->save();
 		}

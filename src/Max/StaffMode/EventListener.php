@@ -13,10 +13,9 @@ use pocketmine\network\mcpe\protocol\{LoginPacket};
 use pocketmine\event\player\{PlayerChatEvent, PlayerInteractEvent, PlayerCommandPreprocessEvent, PlayerDropItemEvent, PlayerKickEvent, PlayerJoinEvent, PlayerQuitEvent, PlayerPreLoginEvent};
 use pocketmine\event\entity\{EntityDamageEvent, EntityDamageByEntityEvent, EntityLevelChangeEvent};
 use pocketmine\event\block\{BlockBreakEvent, BlockPlaceEvent};
-use pocketmine\event\server\{DataPacketReceiveEvent, QueryRegenerateEvent};
+use pocketmine\event\server\{DataPacketReceiveEvent, QueryRegenerateEvent, CommandEvent};
+use pocketmine\event\plugin\PluginDisableEvent;
 use pocketmine\Server;
-use BlockHorizons\PerWorldPlayer\events\PerWorldPlayerDataSaveEvent;
-use BlockHorizons\PerWorldPlayer\world\data\PlayerWorldData;
 
 use function in_array;
 
@@ -27,17 +26,24 @@ class EventListener implements Listener {
         $pl->getServer()->getPluginManager()->registerEvents($this, $pl);
     }
 
+	public function onCommand(CommandEvent $event){
+		if ($event->getCommand() === "stop") {
+			foreach(Server::getInstance()->getOnlinePlayers() as $player){
+				$this->plugin->exitstaffmode($player);
+			}
+		}
+	}
+
 	/**
 	 * @priority LOWEST
 	 */
 
-	public function onPerWorldPlayerDataSave(PerWorldPlayerDataSaveEvent $event) {
+	public function onPluginDisable(PluginDisableEvent $event) {
 		foreach(Server::getInstance()->getOnlinePlayers() as $player){
-			var_dump("yay");
 			$this->plugin->exitstaffmode($player);
-			$event->setPlayerWorldData(PlayerWorldData::fromPlayer($player));
 		}
 	}
+
 
     //If player is NOT banned, save all their alias info when they join.
     /**

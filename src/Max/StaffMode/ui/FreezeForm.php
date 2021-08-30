@@ -14,17 +14,17 @@ class FreezeForm {
     }
 
     public function FreezingForm(Player $player) : void {
-        $form = new CustomForm(function (Player $player, $data) {
+        $form = new CustomForm(function (Player $player, $data, $playernamelist) {
             if($data === null) {
                 return true;
             }
 
-            if (count($this->plugin->getonlineplayersname()) == 0) {
+            if (count($playernamelist) == 0) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 				return true;
             }
 
-            $target = Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["player"]]);
+            $target = Server::getInstance()->getPlayer($playernamelist[$data["player"]]);
             if($target === null) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 				return true;
@@ -42,10 +42,11 @@ class FreezeForm {
             }
 			return true;
         });
+		$playernamelist = $this->plugin->getonlineplayersname();
         $form->setTitle("Freezing Menu");
         $form->addLabel("Toggle if you want to §lUnFreeze§r a player");
         $form->addToggle("Unfreeze?", false, "unfreeze");
-        $form->addDropdown("Pick the player you want to freeze/unfreeze", $this->plugin->getonlineplayersname(), null, "player");
+        $form->addDropdown("Pick the player you want to freeze/unfreeze", $playernamelist, null, "player");
 
         $player->sendForm($form);
     }

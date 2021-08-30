@@ -15,17 +15,17 @@ class KickForm {
     }
 
     public function KickingForm(Player $player) : void {
-        $form = new CustomForm(function (Player $player, $data) {
+        $form = new CustomForm(function (Player $player, $data, $playernamelist) {
             if($data === null) {
                 return true;
             }
 
-            if (count($this->plugin->getonlineplayersname()) == 0) {
+            if (count($playernamelist) == 0) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 				return true;
             }
 
-            $target = Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]);
+            $target = Server::getInstance()->getPlayer($playernamelist[$data["name"]]);
             if($target === null) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 				return true;
@@ -63,8 +63,9 @@ class KickForm {
             }
 			return true;
         });
+		$playernamelist = $this->plugin->getonlineplayersname();
         $form->setTitle("Kicking Menu");
-        $form->addDropdown("Pick the player you want to kick", $this->plugin->getonlineplayersname(), null, "name");
+        $form->addDropdown("Pick the player you want to kick", $playernamelist, null, "name");
         $form->addInput("Reason of kick:", "Ex.: Glitching", "", "reason");
 
         $player->sendForm($form);

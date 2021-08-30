@@ -32,6 +32,8 @@ class InventoryManagerForm {
 				self::InvClearForm($player);
 			} elseif($data == "enderchestclear") {
 				self::EnderChestClearForm($player);
+			} elseif($data == "armorclear") {
+				self::ArmorClearForm($player);
 			}
 			return true;
 		});
@@ -52,26 +54,31 @@ class InventoryManagerForm {
 				$form->addButton("EnderChest Clear", -1, "", "enderchestclear");
 			}
 		}
+		if ($player->hasPermission("staffmode.tools.inventorymanager.armorclear")) {
+			if ($this->plugin->config->get("Allow-Armor-Clear")) {
+				$form->addButton("Armor Clear", -1, "", "armorclear");
+			}
+		}
 
 		$player->sendForm($form);
 	}
 
 	public function InvseeForm(Player $player) : void {
-		$form = new CustomForm(function (Player $player, $data) {
+		$form = new CustomForm(function (Player $player, $data, $playernamelist) {
 			if($data === null) {
 				return true;
 			}
 
-			if (count($this->plugin->getonlineplayersname()) == 0) {
+			if (count($playernamelist) == 0) {
 				$player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 				return true;
 			}
 
-			if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
+			if(Server::getInstance()->getPlayer($playernamelist[$data["name"]]) === null) {
 				$player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 				return true;
 			} else {
-				$targetname = $this->plugin->getonlineplayersname()[$data["name"]];
+				$targetname = $playernamelist[$data["name"]];
 			}
 			$target = Server::getInstance()->getPlayer($targetname);
 			$menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
@@ -176,27 +183,28 @@ class InventoryManagerForm {
 			$menu->send($player);
 			return true;
 		});
+		$playernamelist = $this->plugin->getonlineplayersname();
 		$form->setTitle("Inventory Spy Form");
-		$form->addDropdown("Pick the player you want to see", $this->plugin->getonlineplayersname(), null, "name");
+		$form->addDropdown("Pick the player you want to see", $playernamelist, null, "name");
 		$player->sendForm($form);
 	}
 
 	public function EnderchestSeeForm(Player $player) : void {
-		$form = new CustomForm(function (Player $player, $data) {
+		$form = new CustomForm(function (Player $player, $data, $playernamelist) {
 			if($data === null) {
 				return true;
 			}
 
-			if (count($this->plugin->getonlineplayersname()) == 0) {
+			if (count($playernamelist) == 0) {
 				$player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 				return true;
 			}
 
-			if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
+			if(Server::getInstance()->getPlayer($playernamelist[$data["name"]]) === null) {
 				$player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 				return true;
 			} else {
-				$targetname = $this->plugin->getonlineplayersname()[$data["name"]];
+				$targetname = $playernamelist[$data["name"]];
 			}
 			$target = Server::getInstance()->getPlayer($targetname);
 			$menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
@@ -306,13 +314,14 @@ class InventoryManagerForm {
 			$menu->send($player);
 			return true;
 		});
+		$playernamelist = $this->plugin->getonlineplayersname();
 		$form->setTitle("Ender Chest Spy Form");
-		$form->addDropdown("Pick the player you want to see", $this->plugin->getonlineplayersname(), null, "name");
+		$form->addDropdown("Pick the player you want to see", $playernamelist, null, "name");
 		$player->sendForm($form);
 	}
 
 	public function InvClearForm(Player $player) : void {
-		$form = new CustomForm(function (Player $player, $data) {
+		$form = new CustomForm(function (Player $player, $data, $playernamelist) {
 			if($data === null) {
 				return true;
 			}
@@ -322,19 +331,19 @@ class InventoryManagerForm {
 				return true;
 			}
 
-			if (count($this->plugin->getonlineplayersname()) == 0) {
+			if (count($playernamelist) == 0) {
 				$player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 				return true;
 			}
 
-			if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
+			if(Server::getInstance()->getPlayer($playernamelist[$data["name"]]) === null) {
 				$player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 				return true;
-			} elseif ($this->plugin->getonlineplayersname()[$data["name"]] == $player->getName()) {
+			} elseif ($playernamelist[$data["name"]] == $player->getName()) {
 				$player->sendMessage("§7[§bStaffMode§7] §cCannot inventory clear yourself!");
 				return true;
 			} else {
-				$targetname = $this->plugin->getonlineplayersname()[$data["name"]];
+				$targetname = $playernamelist[$data["name"]];
 			}
 			$target = Server::getInstance()->getPlayer($targetname);
 			$target->getInventory()->clearAll();
@@ -368,14 +377,15 @@ class InventoryManagerForm {
 			}
 			return true;
 		});
+		$playernamelist = $this->plugin->getonlineplayersname();
 		$form->setTitle("Inventory Clear Form");
-		$form->addDropdown("Pick the player you want to inventory clear", $this->plugin->getonlineplayersname(), null, "name");
+		$form->addDropdown("Pick the player you want to inventory clear", $playernamelist, null, "name");
 		$form->addInput("Reason of inventory clear:", "Ex.: Glitched Items", "", "reason");
 		$player->sendForm($form);
 	}
 
 	public function EnderChestClearForm(Player $player) : void {
-		$form = new CustomForm(function (Player $player, $data) {
+		$form = new CustomForm(function (Player $player, $data, $playernamelist) {
 			if($data === null) {
 				return true;
 			}
@@ -385,19 +395,19 @@ class InventoryManagerForm {
 				return true;
 			}
 
-			if (count($this->plugin->getonlineplayersname()) == 0) {
+			if (count($playernamelist) == 0) {
 				$player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 				return true;
 			}
 
-			if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
+			if(Server::getInstance()->getPlayer($playernamelist[$data["name"]]) === null) {
 				$player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 				return true;
-			} elseif ($this->plugin->getonlineplayersname()[$data["name"]] == $player->getName()) {
+			} elseif ($playernamelist[$data["name"]] == $player->getName()) {
 				$player->sendMessage("§7[§bStaffMode§7] §cCannot ender chest clear yourself!");
 				return true;
 			} else {
-				$targetname = $this->plugin->getonlineplayersname()[$data["name"]];
+				$targetname = $playernamelist[$data["name"]];
 			}
 			$target = Server::getInstance()->getPlayer($targetname);
 			$target->getEnderChestInventory()->clearAll();
@@ -431,9 +441,70 @@ class InventoryManagerForm {
 			}
 			return true;
 		});
+		$playernamelist = $this->plugin->getonlineplayersname();
 		$form->setTitle("EnderChest Clear Form");
-		$form->addDropdown("Pick the player you want to ender chest clear", $this->plugin->getonlineplayersname(), null, "name");
+		$form->addDropdown("Pick the player you want to ender chest clear", $playernamelist, null, "name");
 		$form->addInput("Reason of ender chest clear:", "Ex.: Glitched Items", "", "reason");
+		$player->sendForm($form);
+	}
+
+	public function ArmorClearForm(Player $player) : void {
+		$form = new CustomForm(function (Player $player, $data, $playernamelist) {
+			if($data === null) {
+				return true;
+			}
+
+			if($data["reason"] == "") {
+				$player->sendMessage("§7[§bStaffMode§7] §cYou must specify a reason!");
+				return true;
+			}
+
+			if (count($playernamelist) == 0) {
+				$player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
+				return true;
+			}
+
+			if(Server::getInstance()->getPlayer($playernamelist[$data["name"]]) === null) {
+				$player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
+				return true;
+			} elseif ($playernamelist[$data["name"]] == $player->getName()) {
+				$player->sendMessage("§7[§bStaffMode§7] §cCannot armor clear yourself!");
+				return true;
+			} else {
+				$targetname = $playernamelist[$data["name"]];
+			}
+			$target = Server::getInstance()->getPlayer($targetname);
+			$target->getArmorInventory()->clearAll();
+
+			if($this->plugin->history->exists(strtolower($targetname))){
+				$history = $this->plugin->history->get(strtolower($targetname));
+				array_unshift($history, ["type" => "armor cleared", "reason" => $data["reason"], "staff" => $player->getName(), "time" => time()]);
+				$this->plugin->history->set(strtolower($targetname), $history);
+			} else {
+				$this->plugin->history->set(strtolower($targetname), ([["type" => "armor cleared", "reason" => $data["reason"], "staff" => $player->getName(), "time" => time()]]));
+			}
+			$this->plugin->history->save();
+			$player->sendMessage("§7[§bStaffMode§7] §aSuccessfully cleared the armor of player ".$targetname);
+
+			if ($this->plugin->config->get("DiscordWebhooks-Armor-Clears")) {
+				$webHook = new Webhook($this->plugin->config->get("DiscordWebhooks-Armor-Clears-Link"));
+				$msg = new Message();
+				$msg->setUsername("StaffMode-Armor-Clears");
+				$msg->setAvatarURL("https://www.gstatic.com/images/branding/product/1x/admin_512dp.png");
+				$embed = new Embed();
+				$embed->setTitle($targetname." was armor cleared");
+				$embed->setColor(0x00FF00);
+				$embed->addField("Armor Cleared by", $player->getName());
+				$embed->addField("Reason", $data["reason"]);
+				$msg->addEmbed($embed);
+				$webHook->send($msg);
+			}
+			return true;
+		});
+		$playernamelist = $this->plugin->getonlineplayersname();
+		$form->setTitle("Armor Clear Form");
+		$form->addDropdown("Pick the player you want to armor clear", $playernamelist, null, "name");
+		$form->addInput("Reason of armor clear:", "Ex.: Glitched Items", "", "reason");
 		$player->sendForm($form);
 	}
 }

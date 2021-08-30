@@ -49,7 +49,7 @@ class PlayerInfoForm {
     }
 
 	public function AddBoloForm(Player $player) : void {
-		$form = new CustomForm(function (Player $player, $data) {
+		$form = new CustomForm(function (Player $player, $data, $playernamelist) {
 			if($data === null) {
 				return true;
 			}
@@ -60,15 +60,15 @@ class PlayerInfoForm {
 			}
 
 			if ($data["offlinename"] == "") {
-				if (count($this->plugin->getonlineplayersname()) == 0) {
+				if (count($playernamelist) == 0) {
 					$player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 					return true;
 				}
-				if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
+				if(Server::getInstance()->getPlayer($playernamelist[$data["name"]]) === null) {
 					$player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 					return true;
 				} else {
-					$target = $this->plugin->getonlineplayersname()[$data["name"]];
+					$target = $playernamelist[$data["name"]];
 				}
 			} else {
 				$target = $data["offlinename"];
@@ -114,8 +114,9 @@ class PlayerInfoForm {
 			}
 			return true;
 		});
+		$playernamelist = $this->plugin->getonlineplayersname();
 		$form->setTitle("BOLO (Be On Look-Out for)");
-		$form->addDropdown("Pick the player you want to BOLO", $this->plugin->getonlineplayersname(), null, "name");
+		$form->addDropdown("Pick the player you want to BOLO", $playernamelist, null, "name");
 		$form->addInput("Or type the §lEXACT§r name of the player you want to BOLO", "Ex.: ".$player->getName(), "", "offlinename");
 		$form->addInput("Reason of BOLO:", "Ex.: Maybe hacking", "", "reason");
 		$player->sendForm($form);
@@ -179,21 +180,21 @@ class PlayerInfoForm {
 	}
 
     public function HistoryForm(Player $player) : void {
-        $form = new CustomForm(function (Player $player, $data) {
+        $form = new CustomForm(function (Player $player, $data, $playernamelist) {
             if($data === null) {
                 return true;
             }
 
             if ($data["offlinename"] == "") {
-                if (count($this->plugin->getonlineplayersname()) == 0) {
+                if (count($playernamelist) == 0) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
                     return true;
                 }
-                if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
+                if(Server::getInstance()->getPlayer($playernamelist[$data["name"]]) === null) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
                     return true;
                 } else {
-                    $target = $this->plugin->getonlineplayersname()[$data["name"]];
+                    $target = $playernamelist[$data["name"]];
                 }
             } else {
                 $target = $data["offlinename"];
@@ -202,8 +203,9 @@ class PlayerInfoForm {
             self::HistoryFormPartTwo($player, $target);
 			return true;
         });
+		$playernamelist = $this->plugin->getonlineplayersname();
         $form->setTitle("History");
-        $form->addDropdown("Pick the player you want to see", $this->plugin->getonlineplayersname(), null, "name");
+        $form->addDropdown("Pick the player you want to see", $playernamelist, null, "name");
         $form->addInput("Or type the §lEXACT§r name of the player you want to see", "Ex.: ".$player->getName(), "", "offlinename");
 
         $player->sendForm($form);

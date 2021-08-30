@@ -15,22 +15,22 @@ class ReportForm {
     }
 
     public function ReportForm(Player $player) : void {
-        $form = new CustomForm(function (Player $player, $data) {
+        $form = new CustomForm(function (Player $player, $data, $playernamelist) {
             if($data === null) {
                 return true;
             }
 
-            if (count($this->plugin->getonlineplayersname()) == 0) {
+            if (count($playernamelist) == 0) {
                 $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
                 return true;
             }
 
             if ($data["offlinename"] == "") {
-                if(Server::getInstance()->getPlayer($this->plugin->getonlineplayersname()[$data["name"]]) === null) {
+                if(Server::getInstance()->getPlayer($playernamelist[$data["name"]]) === null) {
                     $player->sendMessage("§7[§bStaffMode§7] §cPlayer not found!");
 					return true;
                 } else {
-                    $target = $this->plugin->getonlineplayersname()[$data["name"]];
+                    $target = $playernamelist[$data["name"]];
                 }
             } else {
                 $target = $data["offlinename"];
@@ -75,8 +75,9 @@ class ReportForm {
             }
 			return true;
         });
+		$playernamelist = $this->plugin->getonlineplayersname();
         $form->setTitle("Report Form");
-        $form->addDropdown("Pick the player you want to report", $this->plugin->getonlineplayersname(), null, "name");
+        $form->addDropdown("Pick the player you want to report", $playernamelist, null, "name");
         $form->addInput("Or type the §lEXACT§r name of the player you want to report", "Ex.: ".$player->getName(), "", "offlinename");
         $form->addInput("Reason:", "Ex.: Hacking", "", "reason");
 
