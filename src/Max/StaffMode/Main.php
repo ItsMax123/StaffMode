@@ -109,7 +109,6 @@ class Main extends PluginBase{
 		}
 
 		if ($this->getServer()->getPluginManager()->getPlugin("PerWorldPlayer")) {
-			new PerWorldPlayerEvents($this);
 			$this->config->set("Allow-World-Change", false);
 			$this->config->save();
 		}
