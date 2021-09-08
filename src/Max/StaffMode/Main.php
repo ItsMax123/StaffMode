@@ -271,7 +271,7 @@ class Main extends PluginBase{
 			//Fake join message
 			if ($this->config->get("FakeJoin")) {
 				$message = $this->getConfig()->get("FakeJoin-Message");
-				$message = str_replace("<player>", "$player->getName()", $message);
+				$message = str_replace("<player>", $player->getName(), $message);
 				$this->getServer()->broadcastMessage($message);
 			}
 		}
