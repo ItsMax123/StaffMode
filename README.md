@@ -1,3 +1,5 @@
+# ! **This plugin is broken, I will not be fixing it. Please stop asking for me to fix it.**
+
 [![](https://poggit.pmmp.io/shield.state/StaffMode)](https://poggit.pmmp.io/p/StaffMode)
 [![](https://poggit.pmmp.io/shield.api/StaffMode)](https://poggit.pmmp.io/p/StaffMode)
 
