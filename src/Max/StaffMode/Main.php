@@ -32,19 +32,15 @@ class Main extends PluginBase{
 		$this->getScheduler()->scheduleRepeatingTask(new StaffModeTask($this), 20);
 
         new EventListener($this);
-        $this->ReportForm = new ReportForm($this);
         $this->TeleportForm = new TeleportForm($this);
-        $this->PlayerInfoForm = new PlayerInfoForm($this);
 		$this->InventoryManagerForm = new InventoryManagerForm($this);
-        $this->WarnForm = new WarnForm($this);
         $this->FreezeForm = new FreezeForm($this);
-        $this->MuteForm = new MuteForm($this);
         $this->KickForm = new KickForm($this);
-        $this->BanForm = new BanForm($this);
 
         if(!file_exists($this->getDataFolder())){
             mkdir($this->getDataFolder());
         }
+
 		foreach (
 			[
 				"DiscordWebhookAPI" => Webhook::class,
@@ -58,12 +54,6 @@ class Main extends PluginBase{
 				return;
 			}
 		}
-        $this->banList = new Config($this->getDataFolder()."BanList.yml", Config::YAML);
-        $this->muteList = new Config($this->getDataFolder()."MuteList.yml", Config::YAML);
-        $this->reportList = new Config($this->getDataFolder()."ReportList.yml", Config::YAML);
-		$this->boloList = new Config($this->getDataFolder()."boloList.yml", Config::YAML);
-        $this->alias = new Config($this->getDataFolder()."Alias.yml", Config::YAML);
-		$this->history = new Config($this->getDataFolder()."History.yml", Config::YAML);
         $this->config = new Config($this->getDataFolder()."config.yml", Config::YAML);
 
 		$this->DefaultConfig = array(
@@ -77,24 +67,14 @@ class Main extends PluginBase{
 			"FakeJoin-Message" => "§e<player> joined the game",
 			"SilentJoin" => true,
 			"SilentLeave" => false,
-			"DiscordWebhooks-Bolos" => false,
-			"DiscordWebhooks-Bolos-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
-			"DiscordWebhooks-Reports" => false,
-			"DiscordWebhooks-Reports-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
-			"DiscordWebhooks-Warnings" => false,
-			"DiscordWebhooks-Warnings-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
 			"DiscordWebhooks-Inventory-Clears" => false,
 			"DiscordWebhooks-Inventory-Clears-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
 			"DiscordWebhooks-EnderChest-Clears" => false,
 			"DiscordWebhooks-EnderChest-Clears-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
 			"DiscordWebhooks-Armor-Clears" => false,
 			"DiscordWebhooks-Armor-Clears-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
-			"DiscordWebhooks-Mutes" => false,
-			"DiscordWebhooks-Mutes-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
 			"DiscordWebhooks-Kicks" => false,
-			"DiscordWebhooks-Kicks-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3",
-			"DiscordWebhooks-Bans" => false,
-			"DiscordWebhooks-Bans-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3"
+			"DiscordWebhooks-Kicks-Link" => "https://discord.com/api/webhooks/865604048789831730/zZC1IsbWc0MdCiUZROhgs0q_V1b0BJ7B_kA4I8MG_89VdMhpC0RQ3ur71AVrcvUymCn3"
 		);
 
 		//Automatically update config file if plugin gets updated
@@ -133,9 +113,6 @@ class Main extends PluginBase{
 				case "staffchat":
 					$this->togglestaffchat($sender);
 					return true;
-                case "report":
-                    $this->ReportForm->ReportForm($sender);
-                    return true;
                 default:
                     throw new \AssertionError("This line will never be executed");
             }
@@ -183,15 +160,6 @@ class Main extends PluginBase{
 				$compass->setLore(["§rRight click to open teleportation menu.\nHit a player to see their username."]);
 				$player->getInventory()->setItem(0, $compass);
 			}
-    
-            //BOOK | SEE PLAYER HISTORY
-			if ($player->hasPermission("staffmode.tools.playerinfo")) {
-				$book = Item::get(Item::BOOK, 0, 1);
-				$book->setCustomName("§aPlayer Info");
-				$book->setNamedTagEntry(new StringTag("staffmode", "true"));
-				$book->setLore(["§rRight click to open player info menu."]);
-				$player->getInventory()->setItem(1, $book);
-			}
 
 			//CHEST | INVENTORY MANAGER
 			if ($player->hasPermission("staffmode.tools.inventorymanager")) {
@@ -202,15 +170,6 @@ class Main extends PluginBase{
 				$player->getInventory()->setItem(2, $chest);
 			}
     
-            //PAPER | WARN THE PLAYER
-			if ($player->hasPermission("staffmode.tools.warn")) {
-				$paper = Item::get(Item::PAPER, 0, 1);
-				$paper->setCustomName("§dWarn a player");
-				$paper->setNamedTagEntry(new StringTag("staffmode", "true"));
-				$paper->setLore(["§rRight click to open warning menu."]);
-				$player->getInventory()->setItem(3, $paper);
-			}
-    
             //ICE BLOCK | FREEZE THE PLAYER
 			if ($player->hasPermission("staffmode.tools.freeze")) {
 				$ice = Item::get(Item::PACKED_ICE, 0, 1);
@@ -218,15 +177,6 @@ class Main extends PluginBase{
 				$ice->setNamedTagEntry(new StringTag("staffmode", "true"));
 				$ice->setLore(["§rRight click to open freezing menu.\nHit a player to freeze them."]);
 				$player->getInventory()->setItem(4, $ice);
-			}
-                
-            //GOLD HOE | MUTE THE PLAYER
-			if ($player->hasPermission("staffmode.tools.mute")) {
-				$ghoe = Item::get(Item::GOLDEN_HOE, 0, 1);
-				$ghoe->setCustomName("§6Mute a player");
-				$ghoe->setNamedTagEntry(new StringTag("staffmode", "true"));
-				$ghoe->setLore(["§rRight click to open muting menu."]);
-				$player->getInventory()->setItem(5, $ghoe);
 			}
     
             //GOLD SWORD | KICK THE PLAYER
@@ -236,15 +186,6 @@ class Main extends PluginBase{
 				$gboots->setNamedTagEntry(new StringTag("staffmode", "true"));
 				$gboots->setLore(["§rRight click to open kicking menu."]);
 				$player->getInventory()->setItem(6, $gboots);
-			}
-    
-            //GOLD AXE | BAN THE PLAYER
-			if ($player->hasPermission("staffmode.tools.ban")) {
-				$gaxe = Item::get(Item::GOLDEN_AXE, 0, 1);
-				$gaxe->setCustomName("§4Ban a player");
-				$gaxe->setNamedTagEntry(new StringTag("staffmode", "true"));
-				$gaxe->setLore(["§rRight click to open banning menu."]);
-				$player->getInventory()->setItem(7, $gaxe);
 			}
     
             //REDSTONE_TORCH | EXIT STAFF MODE
